@@ -66,7 +66,7 @@ void pt_xml_load_cfg_diamlink_conn(xmlDocPtr doc, xmlNodePtr cur, diam_link_id_t
     pt_diam_add_conn(diam_link_id, protocol, service, localip, localport, remoteip, remoteport);
 }
 
-void pt_xml_load_cfg_diamlink(xmlDocPtr doc, xmlNodePtr cur) 
+void pt_xml_load_cfg_diamlink(xmlDocPtr doc, xmlNodePtr cur)
 {
     xmlChar *prop;
     pt_uint32_t linkid = (pt_uint32_t)-1;
@@ -242,8 +242,8 @@ void pt_xml_load_cfg_ss7office_as(xmlDocPtr doc, xmlNodePtr cur, ss7office_id_t 
         xmlFree(prop);
     }
 
-    m3ua_as_id = pt_m3ua_add_as(ss7office_id, 
-                        useage, n, mode, 
+    m3ua_as_id = pt_m3ua_add_as(ss7office_id,
+                        useage, n, mode,
                         netapp_flag, netapp,
                         route_context_flag, route_context);
 
@@ -257,7 +257,7 @@ void pt_xml_load_cfg_ss7office_as(xmlDocPtr doc, xmlNodePtr cur, ss7office_id_t 
     }
 }
 
-void pt_xml_load_cfg_ss7office(xmlDocPtr doc, xmlNodePtr cur) 
+void pt_xml_load_cfg_ss7office(xmlDocPtr doc, xmlNodePtr cur)
 {
     xmlChar *prop;
     pt_uint32_t officeid = (pt_uint32_t)-1;
@@ -420,7 +420,7 @@ pt_int32_t pt_xml_load_exec_param(xmlDocPtr doc, xmlNodePtr cur)
         return -0xff;
     }
 
-    if (xmlStrEqual((const xmlChar *)"start", (const xmlChar *)action)) 
+    if (xmlStrEqual((const xmlChar *)"start", (const xmlChar *)action))
         pt_task_start(msgflow_id, count, rate, times, delay);
     else if (xmlStrEqual((const xmlChar *)"stop", (const xmlChar *)action))
         pt_task_stop(msgflow_id);
@@ -487,7 +487,7 @@ pt_int32_t pt_xml_load_exec(pt_char_t *docname)
     return 0;
 }
 
-static pt_int32_t pt_xml_load_uc_diam_matchinfo(xmlDocPtr doc, xmlNodePtr cur, 
+static pt_int32_t pt_xml_load_uc_diam_matchinfo(xmlDocPtr doc, xmlNodePtr cur,
                         pt_char_t *strtag, pt_int32_t *type, pt_uint8_t *data, pt_int32_t *data_len)
 {
     xmlChar *prop;
@@ -568,7 +568,7 @@ pt_int32_t pt_xml_load_uc_diam_msg_replace(xmlDocPtr doc, xmlNodePtr cur, pt_uc_
 }
 
 pt_int32_t pt_xml_load_uc_diam_msg_condition(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msg_id_t msg_id)
-{   
+{
     pt_char_t strtag[64];
     pt_int32_t type;
     pt_uint8_t data[1024];
@@ -617,7 +617,7 @@ pt_int32_t pt_xml_load_uc_diam_msg_para(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msg
 }
 
 pt_int32_t pt_xml_load_uc_ss7_msg_para(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msg_id_t msg_id)
-{    
+{
     xmlChar *prop;
     pt_uint8_t acver = 0;
     pt_uint8_t acvalue = 0;
@@ -697,7 +697,7 @@ pt_int32_t pt_xml_load_uc_ss7_msg_para(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msg_
         xmlFree(prop);
     }
 
-    pt_uc_set_ss7_msg_param(msg_id, acver, acvalue, comptype, opcode, 
+    pt_uc_set_ss7_msg_param(msg_id, acver, acvalue, comptype, opcode,
                     cda_code, cda_ssn, cga_code, cga_ssn);
 
     cur = cur->xmlChildrenNode;
@@ -755,7 +755,7 @@ pt_int32_t pt_xml_load_uc_msg(xmlDocPtr doc, xmlNodePtr cur, pt_uc_inst_id_t ins
     msg_data_len = sizeof(msg_data);
     pt_str2bytes((pt_char_t *)prop, xmlStrlen(prop), msg_data, &msg_data_len);
     xmlFree(prop);
-    
+
     prop = xmlGetProp(cur, (const xmlChar *)"name");
     if (prop == NULL) {
         PT_LOG(PTLOG_ERROR, "there is not name = %s.");
@@ -774,7 +774,7 @@ pt_int32_t pt_xml_load_uc_msg(xmlDocPtr doc, xmlNodePtr cur, pt_uc_inst_id_t ins
     if (msg_type == MSG_TYPE_DIM)
         return pt_xml_load_uc_diam_msg_para(doc, cur, msg_id);
     else
-        return pt_xml_load_uc_ss7_msg_para(doc, cur, msg_id); 
+        return pt_xml_load_uc_ss7_msg_para(doc, cur, msg_id);
 }
 
 pt_int32_t pt_xml_load_uc_inst(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msgflow_id_t msgflow_id)
