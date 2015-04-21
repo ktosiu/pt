@@ -12,5 +12,5 @@ fi
 
 git show-ref --heads > ./src/VERSION
 
-tar -cvjf pt.git`git show-ref --heads |awk '{print substr($1, 1, 8)}'`.tar.gz ./src
+tar -cvjf pt.git`git show -s --pretty='tformat:%h' HEAD`.tar.gz ./src
 
