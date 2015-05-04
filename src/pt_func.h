@@ -9,8 +9,8 @@ extern pt_int32_t pt_addr_ne(pt_sockaddr_storage_t *addr_src, pt_sockaddr_storag
 extern pt_char_t *pt_str_add(pt_char_t *str1, pt_char_t *str2, pt_char_t *result, pt_int32_t base);
 extern pt_char_t *pt_bytes2str(pt_uint8_t *bytes, pt_int32_t bytes_len, pt_char_t *str, pt_int32_t *str_len);
 extern pt_uint8_t *pt_str2bytes(pt_char_t *str, pt_int32_t str_len, pt_uint8_t *bytes, pt_int32_t *bytes_len);
-extern pt_char_t *pt_bcd2str(pt_uint8_t *bcds, pt_int32_t bcds_len, pt_char_t *str, pt_int32_t *str_len);
-extern pt_uint8_t *pt_str2bcd(pt_char_t *str, pt_int32_t str_len, pt_uint8_t *bcds, pt_int32_t *bcds_len);
+extern pt_char_t *pt_bcds2str(pt_uint8_t *bcds, pt_int32_t bcds_len, pt_char_t *str, pt_int32_t *str_len);
+extern pt_uint8_t *pt_str2bcds(pt_char_t *str, pt_int32_t str_len, pt_uint8_t *bcds, pt_int32_t *bcds_len);
 extern pt_int32_t pt_bcdlen(pt_uint8_t *bcds);
 
 #define CHECK_RESULT(x) \

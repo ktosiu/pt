@@ -23,7 +23,7 @@ typedef struct gtcap_tran_id_tag
 #define GCOMP_TYPE_RESULT_NL    0xa7
 typedef struct gtcap_comp_tag
 {
-    pt_uint8_t comp_type;
+    pt_uint32_t comp_type;
     
     pt_uint8_t invoke_id;
 
@@ -64,7 +64,7 @@ typedef struct gtcap_comp_tag
 #define INFO_MAX_LEN    231
 typedef struct gtcap_user_info_tag
 {
-    pt_uint16_t              info_len;
+    pt_int32_t                info_len;
     pt_uint8_t                info[INFO_MAX_LEN];
 }gtcap_user_info_t;
 
@@ -83,7 +83,7 @@ typedef struct gtcap_user_info_tag
 #define RESULT_REJECT_PERMANENT 1
 typedef struct gtcap_dlg_tag
 {
-    pt_uint8_t dlg_type;
+    pt_uint32_t dlg_type;
 
     union {
         struct {
@@ -172,7 +172,7 @@ typedef struct gtcap_abort_tag
 }gtcap_abort_t;
 
 typedef struct {
-    pt_uint8_t m_type;
+    pt_uint32_t m_type;
 
     union {
         gtcap_begin_t   begin;
@@ -198,15 +198,15 @@ typedef struct {
 extern "C" {
 #endif
     pt_int32_t pt_gtcap_decode_comp_item(void *buf, pt_int32_t pos, gtcap_comp_t *comp);
-    pt_int32_t pt_gtcap_encode(gtcap_msg_t *gtcap_msg, void *out, pt_uint16_t *len);
-    pt_int32_t pt_gtcap_decode(void *in, pt_uint16_t len, gtcap_msg_t *gtcap_msg);
+    pt_int32_t pt_gtcap_encode(gtcap_msg_t *gtcap_msg, void *out, pt_int32_t *len);
+    pt_int32_t pt_gtcap_decode(void *in, pt_int32_t len, gtcap_msg_t *gtcap_msg);
 
-	void pt_gtcap_set_invoke_comp(pt_uint8_t invk_id, pt_uint8_t op_code, pt_uint8_t *para, pt_uint16_t len, gtcap_comp_t *comp);
-	void pt_gtcap_set_result_comp(pt_uint8_t invk_id, pt_uint8_t op_code, pt_uint8_t *para, pt_uint16_t len, gtcap_comp_t *comp);
-	void pt_gtcap_set_error_comp(pt_uint8_t invk_id, pt_uint8_t error_code, pt_uint8_t *para, pt_uint16_t len, gtcap_comp_t *comp);
-	void pt_gtcap_set_aarq_dlg(pt_uint8_t ac_ver, pt_uint8_t ac_val, pt_uint8_t *user_info, pt_uint16_t len, gtcap_dlg_t *dlg);
+	void pt_gtcap_set_invoke_comp(pt_uint8_t invk_id, pt_uint8_t op_code, pt_uint8_t *para, pt_int32_t len, gtcap_comp_t *comp);
+	void pt_gtcap_set_result_comp(pt_uint8_t invk_id, pt_uint8_t op_code, pt_uint8_t *para, pt_int32_t len, gtcap_comp_t *comp);
+	void pt_gtcap_set_error_comp(pt_uint8_t invk_id, pt_uint8_t error_code, pt_uint8_t *para, pt_int32_t len, gtcap_comp_t *comp);
+	void pt_gtcap_set_aarq_dlg(pt_uint8_t ac_ver, pt_uint8_t ac_val, pt_uint8_t *user_info, pt_int32_t len, gtcap_dlg_t *dlg);
 	void pt_gtcap_set_aare_dlg(pt_uint8_t ac_ver, pt_uint8_t ac_val, pt_uint8_t result, pt_uint8_t diagnostic, gtcap_dlg_t *dlg);
-	void pt_gtcap_set_abrt_dlg(pt_uint8_t abrt_src, pt_uint8_t *user_info, pt_uint16_t len, gtcap_dlg_t *dlg);
+	void pt_gtcap_set_abrt_dlg(pt_uint8_t abrt_src, pt_uint8_t *user_info, pt_int32_t len, gtcap_dlg_t *dlg);
 
 #ifdef __cplusplus
 };
@@ -251,7 +251,7 @@ typedef struct map_dpdu_open_tag
 #define DPDU_UABORT_APP         0x83
 typedef struct map_dpdu_uabort_tag
 {
-    pt_uint8_t        type;
+    pt_uint32_t        type;
     pt_uint8_t        reason;
 }map_dpdu_uabort_t;
 
@@ -267,7 +267,7 @@ typedef struct map_dpdu_uabort_tag
 #define INVALID_ORI_REF 2
 typedef struct map_dpdu_tag
 {
-    pt_uint8_t        type;
+    pt_uint32_t type;
     union {
         map_dpdu_open_t     open;
         pt_uint8_t          accept;

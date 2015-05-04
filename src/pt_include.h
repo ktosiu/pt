@@ -19,7 +19,9 @@
 #include "pt_diam.h"
 #include "pt_m3ua.h"
 #include "pt_sccp.h"
+#include "pt_asn1.h"
 #include "pt_tcap_itu.h"
+#include "pt_tcap_ansi.h"
 
 #include "pt_usecase.h"
 #include "pt_task.h"

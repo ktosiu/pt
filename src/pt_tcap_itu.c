@@ -1,6 +1,4 @@
 #include "pt_include.h"
-#include "pt_asn1.h"
-#include "pt_tcap_itu.h"
 
 static pt_bool_t g_sup_indef = PT_FALSE;
 
@@ -474,7 +472,7 @@ static pt_int32_t pt_gtcap_encode_tran_id(pt_uint8_t id_tag, gtcap_tran_id_t *tr
     return pos;
 }
 
-static pt_int32_t pt_gtcap_encode_begin(void *msg_struct, void *out, pt_uint16_t *len)
+static pt_int32_t pt_gtcap_encode_begin(void *msg_struct, void *out, pt_int32_t *len)
 {
     gtcap_begin_t *msg = (gtcap_begin_t *)msg_struct;
     pt_int32_t pos = *len;
@@ -518,7 +516,7 @@ static pt_int32_t pt_gtcap_encode_begin(void *msg_struct, void *out, pt_uint16_t
     return pos;
 }
 
-static pt_int32_t pt_gtcap_encode_end(void *msg_struct, void *out, pt_uint16_t *len)
+static pt_int32_t pt_gtcap_encode_end(void *msg_struct, void *out, pt_int32_t *len)
 {
     gtcap_end_t *msg = (gtcap_end_t *)msg_struct;
     pt_int32_t pos = *len;
@@ -560,7 +558,7 @@ static pt_int32_t pt_gtcap_encode_end(void *msg_struct, void *out, pt_uint16_t *
     return pos;
 }
 
-static pt_int32_t pt_gtcap_encode_cont(void *msg_struct, void *out, pt_uint16_t *len)
+static pt_int32_t pt_gtcap_encode_cont(void *msg_struct, void *out, pt_int32_t *len)
 {
     gtcap_cont_t *msg = (gtcap_cont_t *)msg_struct;
     pt_int32_t pos = *len;
@@ -607,7 +605,7 @@ static pt_int32_t pt_gtcap_encode_cont(void *msg_struct, void *out, pt_uint16_t 
     return pos;
 }
 
-static pt_int32_t pt_gtcap_encode_abort(void *msg_struct, void *out, pt_uint16_t *len)
+static pt_int32_t pt_gtcap_encode_abort(void *msg_struct, void *out, pt_int32_t *len)
 {
     gtcap_abort_t *msg = (gtcap_abort_t *)msg_struct;
     pt_int32_t pos = *len;
@@ -646,8 +644,8 @@ static pt_int32_t pt_gtcap_encode_abort(void *msg_struct, void *out, pt_uint16_t
 static pt_int32_t pt_gtcap_decode_invoke_comp(void *buf, pt_int32_t pos, gtcap_comp_t *comp)
 {
     pt_int32_t tmp;
-    pt_uint8_t t;
-    pt_uint16_t l, invoke_len;
+    pt_uint32_t t;
+    pt_int32_t l, invoke_len;
 
     /*invoke component len&tag*/
     if (pt_asn1_code_tag((pt_uint8_t *)buf + pos) != 0xa1)
@@ -704,8 +702,8 @@ static pt_int32_t pt_gtcap_decode_invoke_comp(void *buf, pt_int32_t pos, gtcap_c
 static pt_int32_t pt_gtcap_decode_result_comp(void *buf, pt_int32_t pos, gtcap_comp_t *comp)
 {
     pt_int32_t tmp;
-    pt_uint8_t t;
-    pt_uint16_t l, invoke_len;
+    pt_uint32_t t;
+    pt_int32_t l, invoke_len;
 
     /*result component len&tag*/
     t = pt_asn1_code_tag((pt_uint8_t *)buf + pos);
@@ -768,8 +766,8 @@ static pt_int32_t pt_gtcap_decode_result_comp(void *buf, pt_int32_t pos, gtcap_c
 static pt_int32_t pt_gtcap_decode_error_comp(void *buf, pt_int32_t pos, gtcap_comp_t *comp)
 {
     pt_int32_t tmp;
-    pt_uint8_t t;
-    pt_uint16_t l, invoke_len;
+    pt_uint32_t t;
+    pt_int32_t l, invoke_len;
 
     /*error component len&tag*/
     if (pt_asn1_code_tag((pt_uint8_t *)buf + pos) != 0xa3)
@@ -815,8 +813,8 @@ static pt_int32_t pt_gtcap_decode_error_comp(void *buf, pt_int32_t pos, gtcap_co
 
 static pt_int32_t pt_gtcap_decode_reject_comp(void *buf, pt_int32_t pos, gtcap_comp_t *comp)
 {
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
     
     /*reject component len&tag*/
     if (pt_asn1_code_tag((pt_uint8_t *)buf + pos) != 0xa4)
@@ -880,8 +878,8 @@ pt_int32_t pt_gtcap_decode_comp_item(void *buf, pt_int32_t pos, gtcap_comp_t *co
 
 static pt_int32_t pt_gtcap_decode_comp(void *buf, pt_int32_t pos, gtcap_comp_t *comp)
 {
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
     
     /*component len&tag*/
     if (pt_asn1_code_tag((pt_uint8_t *)buf + pos) != 0x6c)
@@ -900,7 +898,7 @@ static pt_int32_t pt_gtcap_decode_comp(void *buf, pt_int32_t pos, gtcap_comp_t *
 
 static pt_int32_t pt_gtcap_decode_user_info(void *buf, pt_int32_t pos, gtcap_user_info_t *user_info)
 {
-    pt_uint8_t t;
+    pt_uint32_t t;
     
     if (pt_asn1_code_tag((pt_uint8_t *)buf + pos) != 0xbe)
     {
@@ -916,8 +914,8 @@ static pt_int32_t pt_gtcap_decode_user_info(void *buf, pt_int32_t pos, gtcap_use
 static pt_int32_t pt_gtcap_decode_aarq_dlg(void *buf, pt_int32_t pos, gtcap_dlg_t *dlg)
 {
     pt_int32_t tmp;
-    pt_uint8_t t;
-    pt_uint16_t l, dlg_len;
+    pt_uint32_t t;
+    pt_int32_t l, dlg_len;
 
     /*AARQ len&tag*/
     if (pt_asn1_code_tag((pt_uint8_t *)buf + pos) != 0x60)
@@ -978,8 +976,8 @@ static pt_int32_t pt_gtcap_decode_aarq_dlg(void *buf, pt_int32_t pos, gtcap_dlg_
 static pt_int32_t pt_gtcap_decode_aare_dlg(void *buf, pt_int32_t pos, gtcap_dlg_t *dlg)
 {
     pt_int32_t tmp;
-    pt_uint8_t t;
-    pt_uint16_t l, dlg_len;
+    pt_uint32_t t;
+    pt_int32_t l, dlg_len;
 
     /*AARE len&tag*/
     if (pt_asn1_code_tag((pt_uint8_t *)buf + pos) != 0x61)
@@ -1077,8 +1075,8 @@ static pt_int32_t pt_gtcap_decode_aare_dlg(void *buf, pt_int32_t pos, gtcap_dlg_
 static pt_int32_t pt_gtcap_decode_abort_dlg(void *buf, pt_int32_t pos, gtcap_dlg_t *dlg)
 {
     pt_int32_t tmp;
-    pt_uint8_t t;
-    pt_uint16_t l, dlg_len;
+    pt_uint32_t t;
+    pt_int32_t l, dlg_len;
 
     /*ABRT len&tag*/
     if (pt_asn1_code_tag((pt_uint8_t *)buf + pos) != 0x64)
@@ -1113,8 +1111,8 @@ static pt_int32_t pt_gtcap_decode_abort_dlg(void *buf, pt_int32_t pos, gtcap_dlg
 
 static pt_int32_t pt_gtcap_decode_dlg(void *buf, pt_int32_t pos, gtcap_dlg_t *dlg)
 {
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
     
     /*dialogue portion len&tag*/
     if (pt_asn1_code_tag((pt_uint8_t *)buf + pos) != 0x6b)
@@ -1184,8 +1182,8 @@ static pt_int32_t pt_gtcap_decode_dlg(void *buf, pt_int32_t pos, gtcap_dlg_t *dl
 
 static pt_int32_t pt_gtcap_decode_tran_id(void *buf, pt_int32_t pos, gtcap_tran_id_t *tran_id)
 {
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
     
     t = pt_asn1_code_tag((pt_uint8_t *)buf + pos);
     if (t != 0x48 && t != 0x49)
@@ -1201,12 +1199,12 @@ static pt_int32_t pt_gtcap_decode_tran_id(void *buf, pt_int32_t pos, gtcap_tran_
     return pos;
 }
 
-static pt_int32_t pt_gtcap_decode_begin(void *in, pt_uint16_t len, void *msg_struct)
+static pt_int32_t pt_gtcap_decode_begin(void *in, pt_int32_t len, void *msg_struct)
 {
     gtcap_begin_t *msg = (gtcap_begin_t *)msg_struct;
     pt_int32_t pos = 0;
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
 
     /*begin*/
     if (pt_asn1_code_tag((pt_uint8_t *)in + pos) != 0x62)
@@ -1250,12 +1248,12 @@ static pt_int32_t pt_gtcap_decode_begin(void *in, pt_uint16_t len, void *msg_str
     return pos;
 }
 
-static pt_int32_t pt_gtcap_decode_end(void *in, pt_uint16_t len, void *msg_struct)
+static pt_int32_t pt_gtcap_decode_end(void *in, pt_int32_t len, void *msg_struct)
 {
     gtcap_end_t *msg = (gtcap_end_t *)msg_struct;
     pt_int32_t pos = 0;
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
 
     /*end*/
     if (pt_asn1_code_tag((pt_uint8_t *)in + pos) != 0x64)
@@ -1300,12 +1298,12 @@ static pt_int32_t pt_gtcap_decode_end(void *in, pt_uint16_t len, void *msg_struc
 }
 
 
-pt_int32_t pt_gtcap_decode_cont(void *in, pt_uint16_t len, void *msg_struct)
+pt_int32_t pt_gtcap_decode_cont(void *in, pt_int32_t len, void *msg_struct)
 {
     gtcap_cont_t *msg = (gtcap_cont_t *)msg_struct;
     pt_int32_t pos = 0;
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
 
     /*continue*/
     if (pt_asn1_code_tag((pt_uint8_t *)in + pos) != 0x65)
@@ -1353,12 +1351,12 @@ pt_int32_t pt_gtcap_decode_cont(void *in, pt_uint16_t len, void *msg_struct)
     return pos;
 }
 
-pt_int32_t pt_gtcap_decode_abort(void *in, pt_uint16_t len, void *msg_struct)
+pt_int32_t pt_gtcap_decode_abort(void *in, pt_int32_t len, void *msg_struct)
 {
     gtcap_abort_t *msg = (gtcap_abort_t *)msg_struct;
     pt_int32_t pos = 0;
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
 
     /*abort*/
     if (pt_asn1_code_tag((pt_uint8_t *)in + pos) != 0x67)
@@ -1404,7 +1402,7 @@ static const pt_uint8_t _gtcap_code_mapping[] =
     GTCAP_ABORT_TAG_TYPE
 };
 
-typedef pt_int32_t(*_GTCAP_ENCODE_FUNC)(void *msg_struct, void *out, pt_uint16_t *len);
+typedef pt_int32_t(*_GTCAP_ENCODE_FUNC)(void *msg_struct, void *out, pt_int32_t *len);
 static const _GTCAP_ENCODE_FUNC _gtcap_encode_func[] =
 {
     /*GTCAP_BEGIN_TYPE*/        pt_gtcap_encode_begin,
@@ -1413,7 +1411,7 @@ static const _GTCAP_ENCODE_FUNC _gtcap_encode_func[] =
     /*GTCAP_ABORT_TYPE*/        pt_gtcap_encode_abort,
 };
 
-pt_int32_t pt_gtcap_encode(gtcap_msg_t *gtcap_msg, void *out, pt_uint16_t *len)
+pt_int32_t pt_gtcap_encode(gtcap_msg_t *gtcap_msg, void *out, pt_int32_t *len)
 {
     pt_int32_t i;
 
@@ -1424,7 +1422,7 @@ pt_int32_t pt_gtcap_encode(gtcap_msg_t *gtcap_msg, void *out, pt_uint16_t *len)
     return -1;
 }
 
-typedef pt_int32_t(*_GTCAP_DECODE_FUNC)(void *in, pt_uint16_t len, void *msg_struct);
+typedef pt_int32_t(*_GTCAP_DECODE_FUNC)(void *in, pt_int32_t len, void *msg_struct);
 static const _GTCAP_DECODE_FUNC _gtcap_decode_func[] =
 {
     /*GTCAP_BEGIN_TYPE*/        pt_gtcap_decode_begin,
@@ -1433,7 +1431,7 @@ static const _GTCAP_DECODE_FUNC _gtcap_decode_func[] =
     /*GTCAP_ABORT_TYPE*/        pt_gtcap_decode_abort,
 };
 
-pt_int32_t pt_gtcap_decode(void *in, pt_uint16_t len, gtcap_msg_t *gtcap_msg)
+pt_int32_t pt_gtcap_decode(void *in, pt_int32_t len, gtcap_msg_t *gtcap_msg)
 {
     pt_int32_t i;
 
@@ -1446,7 +1444,7 @@ pt_int32_t pt_gtcap_decode(void *in, pt_uint16_t len, gtcap_msg_t *gtcap_msg)
     return -1;
 }
 
-void pt_gtcap_set_invoke_comp(pt_uint8_t invk_id, pt_uint8_t op_code, pt_uint8_t *para, pt_uint16_t len, gtcap_comp_t *comp)
+void pt_gtcap_set_invoke_comp(pt_uint8_t invk_id, pt_uint8_t op_code, pt_uint8_t *para, pt_int32_t len, gtcap_comp_t *comp)
 {
     comp->comp_type     = GCOMP_TYPE_INVOKE;
     comp->invoke_id     = invk_id;
@@ -1456,7 +1454,7 @@ void pt_gtcap_set_invoke_comp(pt_uint8_t invk_id, pt_uint8_t op_code, pt_uint8_t
     memcpy(comp->para, para, len);
 }
 
-void pt_gtcap_set_result_comp(pt_uint8_t invk_id, pt_uint8_t op_code, pt_uint8_t *para, pt_uint16_t len, gtcap_comp_t *comp)
+void pt_gtcap_set_result_comp(pt_uint8_t invk_id, pt_uint8_t op_code, pt_uint8_t *para, pt_int32_t len, gtcap_comp_t *comp)
 {
     comp->comp_type     = GCOMP_TYPE_RESULT;
     comp->invoke_id     = invk_id;
@@ -1465,7 +1463,7 @@ void pt_gtcap_set_result_comp(pt_uint8_t invk_id, pt_uint8_t op_code, pt_uint8_t
     memcpy(comp->para, para, len);
 }
 
-void pt_gtcap_set_error_comp(pt_uint8_t invk_id, pt_uint8_t error_code, pt_uint8_t *para, pt_uint16_t len, gtcap_comp_t *comp)
+void pt_gtcap_set_error_comp(pt_uint8_t invk_id, pt_uint8_t error_code, pt_uint8_t *para, pt_int32_t len, gtcap_comp_t *comp)
 {
     comp->comp_type     = GCOMP_TYPE_ERROR;
     comp->invoke_id     = invk_id;
@@ -1474,7 +1472,7 @@ void pt_gtcap_set_error_comp(pt_uint8_t invk_id, pt_uint8_t error_code, pt_uint8
     memcpy(comp->para, para, len);
 }
 
-void pt_gtcap_set_aarq_dlg(pt_uint8_t ac_ver, pt_uint8_t ac_val, pt_uint8_t *user_info, pt_uint16_t len, gtcap_dlg_t *dlg)
+void pt_gtcap_set_aarq_dlg(pt_uint8_t ac_ver, pt_uint8_t ac_val, pt_uint8_t *user_info, pt_int32_t len, gtcap_dlg_t *dlg)
 {
     dlg->dlg_type = DLG_TYPE_AARQ;
 
@@ -1505,7 +1503,7 @@ void pt_gtcap_set_aare_dlg(pt_uint8_t ac_ver, pt_uint8_t ac_val, pt_uint8_t resu
     dlg->user_info_flg = 0;
 }
 
-void pt_gtcap_set_abrt_dlg(pt_uint8_t abrt_src, pt_uint8_t *user_info, pt_uint16_t len, gtcap_dlg_t *dlg)
+void pt_gtcap_set_abrt_dlg(pt_uint8_t abrt_src, pt_uint8_t *user_info, pt_int32_t len, gtcap_dlg_t *dlg)
 {
     dlg->dlg_type = DLG_TYPE_ABRT;
 
@@ -1525,7 +1523,7 @@ void pt_gtcap_set_abrt_dlg(pt_uint8_t abrt_src, pt_uint8_t *user_info, pt_uint16
 
 pt_int32_t pt_gmap_encode_addr_num(map_addr_t *addr, void *buf, pt_int32_t pos)
 {
-    pt_uint16_t len;
+    pt_int32_t len;
 
     len = (addr->num+1)>>1;
     
@@ -1702,7 +1700,7 @@ pt_int32_t pt_gmap_encode_dpdu(map_dpdu_t *dpdu, gtcap_user_info_t *user_info)
     return pos;
 }
 
-pt_int32_t pt_gmap_decode_addr_nature(void *buf, pt_int32_t pos, pt_uint16_t len, map_addr_t *addr)
+pt_int32_t pt_gmap_decode_addr_nature(void *buf, pt_int32_t pos, pt_int32_t len, map_addr_t *addr)
 {
 	pos = pt_asn1_decode_v(buf, pos, len, addr);
     CHECK_RESULT(pos);
@@ -1710,7 +1708,7 @@ pt_int32_t pt_gmap_decode_addr_nature(void *buf, pt_int32_t pos, pt_uint16_t len
 	return pos;
 }
 
-pt_int32_t pt_gmap_decode_addr_num(void *buf, pt_int32_t pos, pt_uint16_t len, map_addr_t *addr)
+pt_int32_t pt_gmap_decode_addr_num(void *buf, pt_int32_t pos, pt_int32_t len, map_addr_t *addr)
 {
     pos = pt_asn1_decode_v(buf, pos, len, addr->isdn);
     CHECK_RESULT(pos);
@@ -1722,7 +1720,7 @@ pt_int32_t pt_gmap_decode_addr_num(void *buf, pt_int32_t pos, pt_uint16_t len, m
     }
 	return pos;
 }
-pt_int32_t pt_gmap_decode_addr(void *buf, pt_int32_t pos, pt_uint16_t len, map_addr_t *addr)
+pt_int32_t pt_gmap_decode_addr(void *buf, pt_int32_t pos, pt_int32_t len, map_addr_t *addr)
 {
 	pos = pt_gmap_decode_addr_nature(buf, pos, 1, addr);
 	CHECK_RESULT(pos);
@@ -1735,23 +1733,23 @@ pt_int32_t pt_gmap_decode_addr(void *buf, pt_int32_t pos, pt_uint16_t len, map_a
 
 pt_int32_t pt_gmap_decode_dpdu_open(gtcap_user_info_t *user_info, pt_int32_t pos, void *dpdu_open)
 {
-    pt_uint8_t   tag;
-    pt_uint16_t len;
+    pt_uint32_t t;
+    pt_int32_t l;
     
     map_dpdu_open_t *open = (map_dpdu_open_t *)dpdu_open;
 
     if (pos<user_info->info_len && 0x80 == pt_asn1_code_tag(user_info->info + pos))
     {
-        pos = pt_asn1_decode_tl(user_info->info, pos, &tag, &len);
+        pos = pt_asn1_decode_tl(user_info->info, pos, &t, &l);
         CHECK_RESULT(pos);
 
 		if (1)
 		{
-        	pos = pt_gmap_decode_addr(user_info->info, pos, len, &open->dest_ref);
+        	pos = pt_gmap_decode_addr(user_info->info, pos, l, &open->dest_ref);
 		}
 		else
 		{
-			pos = pt_gmap_decode_addr_num(user_info->info, pos, len, &open->dest_ref);
+			pos = pt_gmap_decode_addr_num(user_info->info, pos, l, &open->dest_ref);
 			open->ais_imsi_flg = 1;
 		}
         CHECK_RESULT(pos);
@@ -1761,20 +1759,20 @@ pt_int32_t pt_gmap_decode_dpdu_open(gtcap_user_info_t *user_info, pt_int32_t pos
 
     if (pos<user_info->info_len && 0x81 == pt_asn1_code_tag(user_info->info + pos))
     {
-        pos = pt_asn1_decode_tl(user_info->info, pos, &tag, &len);
+        pos = pt_asn1_decode_tl(user_info->info, pos, &t, &l);
         CHECK_RESULT(pos);
 
-        pos = pt_gmap_decode_addr(user_info->info, pos, len, &open->orig_ref);
+        pos = pt_gmap_decode_addr(user_info->info, pos, l, &open->orig_ref);
         CHECK_RESULT(pos);
 
         open->orig_ref_flg = 1;
     }
 	if (pos<user_info->info_len && 0x82 == pt_asn1_code_tag(user_info->info + pos))
 	{
-		pos = pt_asn1_decode_tl(user_info->info, pos, &tag, &len);
+		pos = pt_asn1_decode_tl(user_info->info, pos, &t, &l);
         CHECK_RESULT(pos);
 		
-        pos = pt_gmap_decode_addr(user_info->info, pos, len, &open->ais_info.msisdn);
+        pos = pt_gmap_decode_addr(user_info->info, pos, l, &open->ais_info.msisdn);
         CHECK_RESULT(pos);
 		
 		open->ais_info.msisdn_flg = 1;
@@ -1782,10 +1780,10 @@ pt_int32_t pt_gmap_decode_dpdu_open(gtcap_user_info_t *user_info, pt_int32_t pos
 	}
 	if (pos<user_info->info_len && 0x83 == pt_asn1_code_tag(user_info->info + pos))
 	{
-		pos = pt_asn1_decode_tl(user_info->info, pos, &tag, &len);
+		pos = pt_asn1_decode_tl(user_info->info, pos, &t, &l);
         CHECK_RESULT(pos);
 		
-        pos = pt_gmap_decode_addr(user_info->info, pos, len, &open->ais_info.vlrnum);
+        pos = pt_gmap_decode_addr(user_info->info, pos, l, &open->ais_info.vlrnum);
         CHECK_RESULT(pos);
 		
 		open->ais_info.vlrnum_flg = 1;
@@ -1798,28 +1796,28 @@ pt_int32_t pt_gmap_decode_dpdu_open(gtcap_user_info_t *user_info, pt_int32_t pos
 pt_int32_t pt_gmap_decode_dpdu(gtcap_user_info_t *user_info, map_dpdu_t *dpdu)
 {
     pt_int32_t pos;
-    pt_uint8_t tag;
-    pt_uint16_t len;
+    pt_uint32_t t;
+    pt_int32_t l;
     
-    pos = pt_asn1_decode_tl(user_info->info, 0, &tag, &len);
+    pos = pt_asn1_decode_tl(user_info->info, 0, &t, &l);
     CHECK_RESULT(pos);
 
-    tag = pt_asn1_code_tag(user_info->info + pos);
-    if (tag == 0x06)/*direct ref*/
+    t = pt_asn1_code_tag(user_info->info + pos);
+    if (t == 0x06)/*direct ref*/
     {
-        pos = pt_asn1_decode_tl(user_info->info, pos, &tag, &len);
+        pos = pt_asn1_decode_tl(user_info->info, pos, &t, &l);
         CHECK_RESULT(pos);
 
-        pos += len;
+        pos += l;
     }
     
-    pos = pt_asn1_decode_tl(user_info->info, pos, &tag, &len);/*0xa0*/
+    pos = pt_asn1_decode_tl(user_info->info, pos, &t, &l);/*0xa0*/
     CHECK_RESULT(pos);
 
-    pos = pt_asn1_decode_tl(user_info->info, pos, &tag, &len);
+    pos = pt_asn1_decode_tl(user_info->info, pos, &t, &l);
     CHECK_RESULT(pos);
     
-    dpdu->type = tag;
+    dpdu->type = t;
     switch (dpdu->type)
     {
     case MAP_DPDU_OPEN:
@@ -1833,21 +1831,21 @@ pt_int32_t pt_gmap_decode_dpdu(gtcap_user_info_t *user_info, map_dpdu_t *dpdu)
     
     case MAP_DPDU_REFUSE:
     case MAP_DPDU_PABORT:
-        pos = pt_asn1_decode_tlv(user_info->info, pos, &tag, &len, &dpdu->unit);
+        pos = pt_asn1_decode_tlv(user_info->info, pos, &t, &l, &dpdu->unit);
         CHECK_RESULT(pos);
         break;
 
     case MAP_DPDU_UABORT:
-        tag = pt_asn1_code_tag(user_info->info + pos);
-        if (tag == DPDU_UABORT_RES_UNAV || tag == DPDU_UABORT_APP)
+        t = pt_asn1_code_tag(user_info->info + pos);
+        if (t == DPDU_UABORT_RES_UNAV || t == DPDU_UABORT_APP)
         {
             pos = pt_asn1_decode_tlv(user_info->info, pos, 
-                    &dpdu->unit.uabort.type, &len, &dpdu->unit.uabort.reason);
+                    &dpdu->unit.uabort.type, &l, &dpdu->unit.uabort.reason);
         }
         else
         {
             pos = pt_asn1_decode_tl(user_info->info, pos, 
-                    &dpdu->unit.uabort.type, &len);
+                    &dpdu->unit.uabort.type, &l);
         }
         CHECK_RESULT(pos);
         break;

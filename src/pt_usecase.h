@@ -60,7 +60,6 @@ typedef enum {
 }pt_uc_data_type;
 
 typedef struct {
-    list_head_t         node;
     avp_condition_t     avp_condition;
     pt_uc_data_type     avp_data_type;
     pt_int32_t          avp_data_len;
@@ -68,11 +67,19 @@ typedef struct {
 }pt_uc_diam_matchinfo_t;
 
 typedef struct {
-    list_head_t         node;
+    pt_uint32_t         asn1_tag;
     pt_uc_data_type     asn1_data_type;
     pt_int32_t          asn1_data_len;
     pt_char_t           asn1_data[1024];
 }pt_uc_ss7_matchinfo_t;
+
+typedef struct {
+    list_head_t         node;
+    union {
+        pt_uc_diam_matchinfo_t diam;
+        pt_uc_ss7_matchinfo_t ss7;
+    }matchinfo;
+}pt_uc_matchinfo_t;
 
 #define PT_UC_MSG_SS7_INVOKE    0
 #define PT_UC_MSG_SS7_RESPOSE   1
@@ -142,7 +149,15 @@ void pt_uc_add_diam_msg_replace(pt_uc_msg_id_t msg_id,
 void pt_uc_add_diam_msg_condition(pt_uc_msg_id_t msg_id, 
                 pt_int32_t condition_type, pt_char_t *condition, pt_int32_t condition_len, 
                 pt_char_t *strtag);
-
+void pt_uc_add_ss7_msg_uid(pt_uc_msg_id_t msg_id, 
+                pt_int32_t uid_type, pt_char_t *uid, pt_int32_t uid_len, 
+                pt_char_t *strtag);
+void pt_uc_add_ss7_msg_replace(pt_uc_msg_id_t msg_id, 
+                pt_int32_t replace_type, pt_char_t *replace, pt_int32_t replace_len, 
+                pt_char_t *strtag);
+void pt_uc_add_ss7_msg_condition(pt_uc_msg_id_t msg_id, 
+                pt_int32_t condition_type, pt_char_t *condition, pt_int32_t condition_len, 
+                pt_char_t *strtag);
 
 #endif /*_PT_USECASE_H_*/
 

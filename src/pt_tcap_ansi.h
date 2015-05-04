@@ -22,7 +22,7 @@ typedef struct ctcap_tran_id_tag
 #define CCOMP_TYPE_REJECT   0xec
 typedef struct ctcap_comp_tag
 {
-    pt_uint8_t        comp_type;
+    pt_uint32_t       comp_type;
 
     pt_uint8_t        comp_id;
 
@@ -84,7 +84,7 @@ typedef struct ctcap_abort_tag
 {
     ctcap_tran_id_t     dest_id;
 
-    pt_uint8_t          abort_type;
+    pt_uint32_t         abort_type;
     pt_uint8_t          abort_cause;
 }ctcap_abort_t;
 
@@ -99,12 +99,12 @@ typedef struct ctcap_abort_tag
 extern "C" {
 #endif
 
-pt_int32_t pt_ctcap_encode(pt_uint8_t type, void *msg_struct, void *out, pt_uint16_t *len);
-pt_int32_t pt_ctcap_decode(pt_uint8_t type, void *in, pt_uint16_t len, void *msg_struct);
+pt_int32_t pt_ctcap_encode(pt_uint32_t type, void *msg_struct, void *out, pt_int32_t *len);
+pt_int32_t pt_ctcap_decode(pt_uint32_t type, void *in, pt_int32_t len, void *msg_struct);
 
-void pt_ctcap_set_invoke_comp(pt_uint8_t comp_id, pt_uint8_t op_code, pt_uint8_t *para, pt_uint16_t len, ctcap_comp_t *comp);
-void pt_ctcap_set_result_comp(pt_uint8_t comp_id, pt_uint8_t *para, pt_uint16_t len, ctcap_comp_t *comp);
-void pt_ctcap_set_error_comp(pt_uint8_t comp_id, pt_uint8_t error_code, pt_uint8_t *para, pt_uint16_t len, ctcap_comp_t *comp);
+void pt_ctcap_set_invoke_comp(pt_uint8_t comp_id, pt_uint8_t op_code, pt_uint8_t *para, pt_int32_t len, ctcap_comp_t *comp);
+void pt_ctcap_set_result_comp(pt_uint8_t comp_id, pt_uint8_t *para, pt_int32_t len, ctcap_comp_t *comp);
+void pt_ctcap_set_error_comp(pt_uint8_t comp_id, pt_uint8_t error_code, pt_uint8_t *para, pt_int32_t len, ctcap_comp_t *comp);
 
 #ifdef __cplusplus
 };

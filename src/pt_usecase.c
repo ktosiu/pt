@@ -96,24 +96,24 @@ pt_uc_msg_t *pt_uc_alloc_msg(pt_uc_inst_t *inst)
 
 void pt_uc_free_msg(pt_uc_msg_t *msg)
 {
-    pt_uc_diam_matchinfo_t *matchinfo;
+    pt_uc_matchinfo_t *matchinfo;
 
     list_del(&msg->node);
 
     while (!list_empty(&msg->list_msg_uid)) {
-        matchinfo = list_entry(msg->list_msg_uid.next, pt_uc_diam_matchinfo_t, node);
+        matchinfo = list_entry(msg->list_msg_uid.next, pt_uc_matchinfo_t, node);
         list_del(&matchinfo->node);
         pt_free(matchinfo);
     }
 
     while (!list_empty(&msg->list_msg_replace)) {
-        matchinfo = list_entry(msg->list_msg_replace.next, pt_uc_diam_matchinfo_t, node);
+        matchinfo = list_entry(msg->list_msg_replace.next, pt_uc_matchinfo_t, node);
         list_del(&matchinfo->node);
         pt_free(matchinfo);
     }
 
     while (!list_empty(&msg->list_msg_condition)) {
-        matchinfo = list_entry(msg->list_msg_condition.next, pt_uc_diam_matchinfo_t, node);
+        matchinfo = list_entry(msg->list_msg_condition.next, pt_uc_matchinfo_t, node);
         list_del(&matchinfo->node);
         pt_free(matchinfo);
     }
@@ -217,31 +217,31 @@ void pt_uc_set_ss7_msg_param(pt_uc_msg_id_t msg_id,
     msg->msg_ss7_opcode = opcode;
     msg->msg_ss7_cda_ssn = cda_ssn;
     msg->msg_ss7_cga_ssn = cga_ssn;
-    pt_str2bcd(cda_code, strlen(cda_code), msg->msg_ss7_cda_code, NULL);
-    pt_str2bcd(cga_code, strlen(cga_code), msg->msg_ss7_cga_code, NULL);
+    pt_str2bcds(cda_code, strlen(cda_code), msg->msg_ss7_cda_code, NULL);
+    pt_str2bcds(cga_code, strlen(cga_code), msg->msg_ss7_cga_code, NULL);
 }
 
 void pt_uc_add_diam_matchinfo(list_head_t *plist, 
                 pt_int32_t uid_type, pt_char_t *uid, pt_int32_t uid_len, 
                 pt_char_t *strtag)
 {
-    pt_uc_diam_matchinfo_t *matchinfo;
+    pt_uc_matchinfo_t *matchinfo;
 
-    matchinfo = pt_malloc(sizeof(pt_uc_diam_matchinfo_t));
+    matchinfo = pt_malloc(sizeof(pt_uc_matchinfo_t));
     if (matchinfo == NULL) {
         PT_LOG(PTLOG_ERROR, "malloc uid buffer failed!");
         return;
     }
-    memset(matchinfo, 0, sizeof(pt_uc_diam_matchinfo_t));
+    memset(matchinfo, 0, sizeof(pt_uc_matchinfo_t));
 
     pt_uc_parser_diam_msg_strtag(strtag, 
-            &matchinfo->avp_condition.avp_level_num, 
-            matchinfo->avp_condition.avp_code, 
-            matchinfo->avp_condition.avp_position);
+            &matchinfo->matchinfo.diam.avp_condition.avp_level_num, 
+            matchinfo->matchinfo.diam.avp_condition.avp_code, 
+            matchinfo->matchinfo.diam.avp_condition.avp_position);
 
-    matchinfo->avp_data_type = uid_type;
-    memcpy(matchinfo->avp_data, uid, (pt_uint32_t)uid_len);
-    matchinfo->avp_data_len = uid_len;
+    matchinfo->matchinfo.diam.avp_data_type = uid_type;
+    memcpy(matchinfo->matchinfo.diam.avp_data, uid, (pt_uint32_t)uid_len);
+    matchinfo->matchinfo.diam.avp_data_len = uid_len;
     
     list_add_tail(&matchinfo->node, plist);
 }
@@ -267,6 +267,51 @@ void pt_uc_add_diam_msg_condition(pt_uc_msg_id_t msg_id,
                 pt_char_t *strtag)
 {
     pt_uc_add_diam_matchinfo(&((pt_uc_msg_t *)msg_id)->list_msg_condition,
+                condition_type, condition, condition_len, strtag);
+}
+
+void pt_uc_add_ss7_matchinfo(list_head_t *plist, 
+                pt_int32_t uid_type, pt_char_t *uid, pt_int32_t uid_len, 
+                pt_char_t *strtag)
+{
+    pt_uc_matchinfo_t *matchinfo;
+
+    matchinfo = pt_malloc(sizeof(pt_uc_matchinfo_t));
+    if (matchinfo == NULL) {
+        PT_LOG(PTLOG_ERROR, "malloc uid buffer failed!");
+        return;
+    }
+    memset(matchinfo, 0, sizeof(pt_uc_matchinfo_t));
+
+    matchinfo->matchinfo.ss7.asn1_tag = atoi(strtag);
+    matchinfo->matchinfo.ss7.asn1_data_type = uid_type;
+    memcpy(matchinfo->matchinfo.ss7.asn1_data, uid, (pt_uint32_t)uid_len);
+    matchinfo->matchinfo.ss7.asn1_data_len = uid_len;
+    
+    list_add_tail(&matchinfo->node, plist);
+}
+
+void pt_uc_add_ss7_msg_uid(pt_uc_msg_id_t msg_id, 
+                pt_int32_t uid_type, pt_char_t *uid, pt_int32_t uid_len, 
+                pt_char_t *strtag)
+{
+    pt_uc_add_ss7_matchinfo(&((pt_uc_msg_t *)msg_id)->list_msg_uid,
+            uid_type, uid, uid_len, strtag);
+}
+
+void pt_uc_add_ss7_msg_replace(pt_uc_msg_id_t msg_id, 
+                pt_int32_t replace_type, pt_char_t *replace, pt_int32_t replace_len, 
+                pt_char_t *strtag)
+{
+    pt_uc_add_ss7_matchinfo(&((pt_uc_msg_t *)msg_id)->list_msg_replace,
+            replace_type, replace, replace_len, strtag);
+}
+
+void pt_uc_add_ss7_msg_condition(pt_uc_msg_id_t msg_id, 
+                pt_int32_t condition_type, pt_char_t *condition, pt_int32_t condition_len, 
+                pt_char_t *strtag)
+{
+    pt_uc_add_ss7_matchinfo(&((pt_uc_msg_t *)msg_id)->list_msg_condition,
                 condition_type, condition, condition_len, strtag);
 }
 

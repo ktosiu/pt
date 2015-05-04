@@ -215,7 +215,7 @@ pt_uint8_t *pt_str2bytes(pt_char_t *str, pt_int32_t str_len, pt_uint8_t *bytes, 
     return bytes;
 }
 
-pt_char_t *pt_bcd2str(pt_uint8_t *bcds, pt_int32_t bcds_len, pt_char_t *str, pt_int32_t *str_len)
+pt_char_t *pt_bcds2str(pt_uint8_t *bcds, pt_int32_t bcds_len, pt_char_t *str, pt_int32_t *str_len)
 {
     pt_int32_t i, j;
 
@@ -234,7 +234,7 @@ pt_char_t *pt_bcd2str(pt_uint8_t *bcds, pt_int32_t bcds_len, pt_char_t *str, pt_
     return str;
 }
 
-pt_uint8_t *pt_str2bcd(pt_char_t *str, pt_int32_t str_len, pt_uint8_t *bcds, pt_int32_t *bcds_len)
+pt_uint8_t *pt_str2bcds(pt_char_t *str, pt_int32_t str_len, pt_uint8_t *bcds, pt_int32_t *bcds_len)
 {
     pt_int32_t i, j;
 
@@ -255,7 +255,7 @@ pt_uint8_t *pt_str2bcd(pt_char_t *str, pt_int32_t str_len, pt_uint8_t *bcds, pt_
 
     bcds[j / 2] |= 0xf0;
     if (bcds_len != NULL)
-        *bcds_len = j;
+        *bcds_len = (j + 1) >> 1;
 
     return bcds;
 }

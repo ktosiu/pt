@@ -1,6 +1,4 @@
 #include "pt_include.h"
-#include "pt_asn1.h"
-#include "pt_tcap_ansi.h"
 
 static pt_int32_t pt_ctcap_encode_invoke_comp(ctcap_comp_t *comp, void *buf, pt_int32_t pos)
 {
@@ -101,7 +99,7 @@ static pt_int32_t pt_ctcap_encode_comp(ctcap_comp_t *comp, void *buf, pt_int32_t
 
 static pt_int32_t pt_ctcap_encode_tran_id(ctcap_tran_id_t *orig_id, ctcap_tran_id_t *dest_id, void *buf, pt_int32_t pos)
 {
-    pt_uint16_t l = 0;
+    pt_int32_t l = 0;
 
     if (dest_id!=NULL)
     {
@@ -125,7 +123,7 @@ static pt_int32_t pt_ctcap_encode_tran_id(ctcap_tran_id_t *orig_id, ctcap_tran_i
     return pos;
 }
 
-static pt_int32_t pt_ctcap_encode_unidir(void *msg_struct, void *out, pt_uint16_t *len)
+static pt_int32_t pt_ctcap_encode_unidir(void *msg_struct, void *out, pt_int32_t *len)
 {
     ctcap_unidir_t *msg = (ctcap_unidir_t *)msg_struct;
     pt_int32_t pos = *len;
@@ -147,7 +145,7 @@ static pt_int32_t pt_ctcap_encode_unidir(void *msg_struct, void *out, pt_uint16_
     return pos;
 }
 
-static pt_int32_t pt_ctcap_encode_query(void *msg_struct, void *out, pt_uint16_t *len)
+static pt_int32_t pt_ctcap_encode_query(void *msg_struct, void *out, pt_int32_t *len)
 {
     ctcap_query_t *msg = (ctcap_query_t *)msg_struct;
     pt_int32_t pos = *len;
@@ -169,7 +167,7 @@ static pt_int32_t pt_ctcap_encode_query(void *msg_struct, void *out, pt_uint16_t
     return pos;
 }
 
-static pt_int32_t pt_ctcap_encode_response(void *msg_struct, void *out, pt_uint16_t *len)
+static pt_int32_t pt_ctcap_encode_response(void *msg_struct, void *out, pt_int32_t *len)
 {
     ctcap_response_t *msg = (ctcap_response_t *)msg_struct;
     pt_int32_t pos = *len;
@@ -191,7 +189,7 @@ static pt_int32_t pt_ctcap_encode_response(void *msg_struct, void *out, pt_uint1
     return pos;
 }
 
-static pt_int32_t pt_ctcap_encode_cont(void *msg_struct, void *out, pt_uint16_t *len)
+static pt_int32_t pt_ctcap_encode_cont(void *msg_struct, void *out, pt_int32_t *len)
 {
     ctcap_cont_t *msg = (ctcap_cont_t *)msg_struct;
     pt_int32_t pos = *len;
@@ -213,7 +211,7 @@ static pt_int32_t pt_ctcap_encode_cont(void *msg_struct, void *out, pt_uint16_t 
     return pos;
 }
 
-static pt_int32_t pt_ctcap_encode_abort(void *msg_struct, void *out, pt_uint16_t *len)
+static pt_int32_t pt_ctcap_encode_abort(void *msg_struct, void *out, pt_int32_t *len)
 {
     ctcap_abort_t *msg = (ctcap_abort_t *)msg_struct;
     pt_int32_t pos = *len;
@@ -236,8 +234,8 @@ static pt_int32_t pt_ctcap_encode_abort(void *msg_struct, void *out, pt_uint16_t
 
 static pt_int32_t pt_ctcap_decode_invoke_comp(void *buf, pt_int32_t pos, ctcap_comp_t *comp)
 {
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
     pt_uint8_t opcode[2];
 
     /*invoke component len&tag*/
@@ -281,8 +279,8 @@ static pt_int32_t pt_ctcap_decode_invoke_comp(void *buf, pt_int32_t pos, ctcap_c
 
 static pt_int32_t pt_ctcap_decode_result_comp(void *buf, pt_int32_t pos, ctcap_comp_t *comp)
 {
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
 
     /*result component len&tag*/
     if (pt_asn1_code_tag((pt_uint8_t *)buf + pos) != 0xea)
@@ -313,8 +311,8 @@ static pt_int32_t pt_ctcap_decode_result_comp(void *buf, pt_int32_t pos, ctcap_c
 
 static pt_int32_t pt_ctcap_decode_error_comp(void *buf, pt_int32_t pos, ctcap_comp_t *comp)
 {
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
 
     /*invoke component len&tag*/
     if (pt_asn1_code_tag((pt_uint8_t *)buf + pos) != 0xeb)
@@ -355,8 +353,8 @@ static pt_int32_t pt_ctcap_decode_error_comp(void *buf, pt_int32_t pos, ctcap_co
 
 static pt_int32_t pt_ctcap_decode_comp(void *buf, pt_int32_t pos, ctcap_comp_t *comp)
 {
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
 
     /*Component Sequence Id&len*/
     if (pt_asn1_code_tag((pt_uint8_t *)buf + pos) != 0xe8)
@@ -393,8 +391,8 @@ static pt_int32_t pt_ctcap_decode_comp(void *buf, pt_int32_t pos, ctcap_comp_t *
 
 static pt_int32_t pt_ctcap_decode_tran_id(void *buf, pt_int32_t pos, ctcap_tran_id_t *orig_id, ctcap_tran_id_t *dest_id)
 {
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
 
     if (pt_asn1_code_tag((pt_uint8_t *)buf + pos) != 0xc7)
     {
@@ -432,12 +430,12 @@ static pt_int32_t pt_ctcap_decode_tran_id(void *buf, pt_int32_t pos, ctcap_tran_
     return pos;
 }
 
-static pt_int32_t pt_ctcap_decode_unidir(void *in, pt_uint16_t len, void *msg_struct)
+static pt_int32_t pt_ctcap_decode_unidir(void *in, pt_int32_t len, void *msg_struct)
 {
     ctcap_unidir_t *msg = (ctcap_unidir_t *)msg_struct;
     pt_int32_t pos = 0;
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
 
     if (pt_asn1_code_tag(in) != 0xe1)
     {
@@ -458,12 +456,12 @@ static pt_int32_t pt_ctcap_decode_unidir(void *in, pt_uint16_t len, void *msg_st
     return pos;
 }
 
-static pt_int32_t pt_ctcap_decode_query(void *in, pt_uint16_t len, void *msg_struct)
+static pt_int32_t pt_ctcap_decode_query(void *in, pt_int32_t len, void *msg_struct)
 {
     ctcap_query_t *msg = (ctcap_query_t *)msg_struct;
     pt_int32_t pos = 0;
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
 	
 	t = pt_asn1_code_tag(in);
     if (t != 0xe2 && t != 0xe3)
@@ -485,12 +483,12 @@ static pt_int32_t pt_ctcap_decode_query(void *in, pt_uint16_t len, void *msg_str
     return pos;
 }
 
-static pt_int32_t pt_ctcap_decode_response(void *in, pt_uint16_t len, void *msg_struct)
+static pt_int32_t pt_ctcap_decode_response(void *in, pt_int32_t len, void *msg_struct)
 {
     ctcap_response_t *msg = (ctcap_response_t *)msg_struct;
     pt_int32_t pos = 0;
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
 
     if (pt_asn1_code_tag(in) != 0xe4)
     {
@@ -511,12 +509,12 @@ static pt_int32_t pt_ctcap_decode_response(void *in, pt_uint16_t len, void *msg_
     return pos;
 }
 
-static pt_int32_t pt_ctcap_decode_cont(void *in, pt_uint16_t len, void *msg_struct)
+static pt_int32_t pt_ctcap_decode_cont(void *in, pt_int32_t len, void *msg_struct)
 {
     ctcap_cont_t *msg = (ctcap_cont_t *)msg_struct;
     pt_int32_t pos = 0;
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
 	
 	t = pt_asn1_code_tag(in);
     if (t != 0xe5 && t!= 0xe6)
@@ -538,12 +536,12 @@ static pt_int32_t pt_ctcap_decode_cont(void *in, pt_uint16_t len, void *msg_stru
     return pos;
 }
 
-static pt_int32_t pt_ctcap_decode_abort(void *in, pt_uint16_t len, void *msg_struct)
+static pt_int32_t pt_ctcap_decode_abort(void *in, pt_int32_t len, void *msg_struct)
 {
     ctcap_abort_t *msg = (ctcap_abort_t *)msg_struct;
     pt_int32_t pos = 0;
-    pt_uint8_t t;
-    pt_uint16_t l;
+    pt_uint32_t t;
+    pt_int32_t l;
 
     if (pt_asn1_code_tag(in) != 0xf6)
     {
@@ -563,7 +561,7 @@ static pt_int32_t pt_ctcap_decode_abort(void *in, pt_uint16_t len, void *msg_str
     return pos;
 }
 
-typedef pt_int32_t(*CTCAP_ENCODE_FUNC)(void *msg_struct, void *out, pt_uint16_t *len);
+typedef pt_int32_t(*CTCAP_ENCODE_FUNC)(void *msg_struct, void *out, pt_int32_t *len);
 static const CTCAP_ENCODE_FUNC ctcap_encode_func[] =
 {
     /*CTCAP_UNIDIR_TYPE*/       pt_ctcap_encode_unidir,
@@ -573,12 +571,12 @@ static const CTCAP_ENCODE_FUNC ctcap_encode_func[] =
     /*CTCAP_ABORT_TYPE*/        pt_ctcap_encode_abort,
 };
 
-pt_int32_t pt_ctcap_encode(pt_uint8_t type, void *msg_struct, void *out, pt_uint16_t *len)
+pt_int32_t pt_ctcap_encode(pt_uint32_t type, void *msg_struct, void *out, pt_int32_t *len)
 {
     return ctcap_encode_func[type](msg_struct, out, len);
 }
 
-typedef pt_int32_t(*CTCAP_DECODE_FUNC)(void *in, pt_uint16_t len, void *msg_struct);
+typedef pt_int32_t(*CTCAP_DECODE_FUNC)(void *in, pt_int32_t len, void *msg_struct);
 static const CTCAP_DECODE_FUNC ctcap_decode_func[] =
 {
     /*CTCAP_UNIDIR_TYPE*/       pt_ctcap_decode_unidir,
@@ -588,12 +586,12 @@ static const CTCAP_DECODE_FUNC ctcap_decode_func[] =
     /*CTCAP_ABORT_TYPE*/        pt_ctcap_decode_abort,
 };
 
-pt_int32_t pt_ctcap_decode(pt_uint8_t type, void *in, pt_uint16_t len, void *msg_struct)
+pt_int32_t pt_ctcap_decode(pt_uint32_t type, void *in, pt_int32_t len, void *msg_struct)
 {
     return ctcap_decode_func[type](in, len, msg_struct);
 }
 
-void pt_ctcap_set_invoke_comp(pt_uint8_t comp_id, pt_uint8_t op_code, pt_uint8_t *para, pt_uint16_t len, ctcap_comp_t *comp)
+void pt_ctcap_set_invoke_comp(pt_uint8_t comp_id, pt_uint8_t op_code, pt_uint8_t *para, pt_int32_t len, ctcap_comp_t *comp)
 {
     comp->comp_type = CCOMP_TYPE_INVOKE;
     comp->comp_id   = comp_id;
@@ -603,7 +601,7 @@ void pt_ctcap_set_invoke_comp(pt_uint8_t comp_id, pt_uint8_t op_code, pt_uint8_t
     memcpy(comp->para, para, len);
 }
 
-void pt_ctcap_set_result_comp(pt_uint8_t comp_id, pt_uint8_t *para, pt_uint16_t len, ctcap_comp_t *comp)
+void pt_ctcap_set_result_comp(pt_uint8_t comp_id, pt_uint8_t *para, pt_int32_t len, ctcap_comp_t *comp)
 {
     comp->comp_type = CCOMP_TYPE_RESULT;
     comp->comp_id   = comp_id;
@@ -612,7 +610,7 @@ void pt_ctcap_set_result_comp(pt_uint8_t comp_id, pt_uint8_t *para, pt_uint16_t 
     memcpy(comp->para, para, len);
 }
 
-void pt_ctcap_set_error_comp(pt_uint8_t comp_id, pt_uint8_t error_code, pt_uint8_t *para, pt_uint16_t len, ctcap_comp_t *comp)
+void pt_ctcap_set_error_comp(pt_uint8_t comp_id, pt_uint8_t error_code, pt_uint8_t *para, pt_int32_t len, ctcap_comp_t *comp)
 {
     comp->comp_type = CCOMP_TYPE_RESULT;
     comp->comp_id   = comp_id;

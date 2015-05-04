@@ -3,8 +3,116 @@ static sccp_up_msg_t _recv_sccp_up_msg;
 static sccp_up_msg_t _send_sccp_up_msg;
 static gtcap_msg_t _recv_gtcap_msg;
 static gtcap_msg_t _send_gtcap_msg;
-static pt_uint16_t _task_ss7_buf_len;
+static pt_int32_t _task_ss7_buf_len;
 static pt_uint8_t _task_ss7_buf[MAX_SS7_MSG];
+
+void pt_task_update_ss7_str_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_ss7_matchinfo_t *ss7_uid)
+{
+    ;
+}
+
+void pt_task_update_ss7_bytes_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_ss7_matchinfo_t *ss7_uid)
+{
+    pt_int32_t pos;
+    pt_uint32_t t;
+    pt_int32_t l;
+    pt_int32_t uid_len;
+    pt_char_t uid[128];
+    pt_char_t str_seq[32];
+    pt_int32_t str_uid_len;
+    pt_char_t str_uid[128];
+    pt_char_t str_result[128];
+
+    pos = pt_asn1_code_tag_pos(ss7_uid->asn1_tag, msg->msg_data, msg->msg_data_len);
+    if (pos < 0) {
+        PT_LOG(PTLOG_DEBUG, "there is not tag = %#x in msg_data", ss7_uid->asn1_tag);
+        return;
+    }
+
+    pos = pt_asn1_decode_tl(msg->msg_data + pos, pos, &t, &l);
+
+    sprintf(str_seq, "%lx", seq);
+
+    str_uid_len = sizeof(str_uid);
+    pt_bytes2str((pt_uint8_t *)ss7_uid->asn1_data, ss7_uid->asn1_data_len, str_uid, &str_uid_len);
+
+    pt_str_add(str_seq, str_uid, str_result, 16);
+    
+    uid_len = sizeof(uid);
+    pt_str2bytes(str_result, (pt_int32_t)strlen(str_result), (pt_uint8_t *)uid, &uid_len);
+
+    if (uid_len < l)
+        memcpy(msg->msg_data + pos + l - uid_len, uid, uid_len);
+    else
+        memcpy(msg->msg_data + pos, &uid[uid_len - l], uid_len);
+}
+
+void pt_task_update_ss7_bcd_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_ss7_matchinfo_t *ss7_uid)
+{
+    pt_int32_t pos;
+    pt_uint32_t t;
+    pt_int32_t l;
+    pt_int32_t uid_len;
+    pt_char_t uid[128];
+    pt_char_t str_seq[32];
+    pt_int32_t str_uid_len;
+    pt_char_t str_uid[128];
+    pt_char_t str_result[128];
+
+    pos = pt_asn1_code_tag_pos(ss7_uid->asn1_tag, msg->msg_data, msg->msg_data_len);
+    if (pos < 0) {
+        PT_LOG(PTLOG_DEBUG, "there is not tag = %#x in msg_data", ss7_uid->asn1_tag);
+        return;
+    }
+
+    PT_LOG(PTLOG_DEBUG, "there is tag = %#x in msg_data", ss7_uid->asn1_tag);
+
+    pos = pt_asn1_decode_tl(msg->msg_data, pos, &t, &l);
+
+    sprintf(str_seq, "%lx", seq);
+
+    str_uid_len = sizeof(str_uid);
+    pt_bcds2str((pt_uint8_t *)ss7_uid->asn1_data, 
+            pt_bcdlen((pt_uint8_t *)ss7_uid->asn1_data), str_uid, &str_uid_len);
+    PT_LOG(PTLOG_DEBUG, "there is uid = %s in msg_data, str_seq = %s", str_uid, str_seq);
+
+    pt_str_add(str_seq, str_uid, str_result, 10);
+    PT_LOG(PTLOG_DEBUG, "there is bcd add uid = %s in msg_data", str_result);
+    
+    uid_len = sizeof(uid);
+    pt_str2bcds(str_result, (pt_int32_t)strlen(str_result), (pt_uint8_t *)uid, &uid_len);
+    PT_LOG(PTLOG_DEBUG, "there is uid_len  = %d , l = %d, pos = %d in msg_data", uid_len, l, pos);
+
+    if (uid_len < l)
+        memcpy(msg->msg_data + pos + l - uid_len, uid, uid_len);
+    else
+        memcpy(msg->msg_data + pos, &uid[uid_len - l], uid_len);
+}
+
+void pt_task_update_ss7_uid_with_seq(pt_uc_msg_t *msg, pt_uint64_t seq)
+{
+    list_head_t *ss7_uid_pos;
+    pt_uc_matchinfo_t *ss7_uid;
+
+    list_for_each(ss7_uid_pos, &msg->list_msg_uid) {
+        ss7_uid = list_entry(ss7_uid_pos, pt_uc_matchinfo_t, node);
+        switch(ss7_uid->matchinfo.ss7.asn1_data_type) {
+        case PT_UC_DATA_STR:
+            pt_task_update_ss7_str_uid(msg, seq, &ss7_uid->matchinfo.ss7);
+            break;
+        case PT_UC_DATA_IPV4:
+        case PT_UC_DATA_IPV6:
+        case PT_UC_DATA_BYTE:
+            pt_task_update_ss7_bytes_uid(msg, seq, &ss7_uid->matchinfo.ss7);
+            break;
+        case PT_UC_DATA_BCD:
+            pt_task_update_ss7_bcd_uid(msg, seq, &ss7_uid->matchinfo.ss7);
+            break;
+        default:
+            break;
+        }
+    }
+}
 
 pt_bool_t pt_task_is_ss7_cdma_msg(pt_uc_msg_t *msg)
 {
@@ -517,6 +625,9 @@ pt_int32_t pt_task_send_ss7_begin_msg(pt_uc_msg_t *begin_msg, pt_uint64_t seq)
     ss7_invokeinfo = pt_task_ss7_local_invokeinfo_alloc(pdb, begin_msg->msg_ss7_opcode);
 
     _send_gtcap_msg.m_type = GTCAP_BEGIN_TAG_TYPE;
+
+    /*更新用户标识*/
+    pt_task_update_ss7_uid_with_seq(begin_msg, pdb->seq);
 
     /*dlginfo&traninfo*/
     pt_task_set_ss7_tran_id(pdb, &_send_gtcap_msg.m_begin.orig_id);
