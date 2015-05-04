@@ -173,7 +173,7 @@ pt_task_pdb_t *pt_task_locate_ss7_pdb(gtcap_msg_t *gtcap_msg)
     if (tran_id == NULL)
         return NULL;
 
-    memcpy(&id, &tran_id->id, 4);
+    memcpy(&id, tran_id->id, 4);
     hword = id >> 16;
     lword = id & 0xffff;
 

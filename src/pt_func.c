@@ -255,7 +255,7 @@ pt_uint8_t *pt_str2bcds(pt_char_t *str, pt_int32_t str_len, pt_uint8_t *bcds, pt
 
     bcds[j / 2] |= 0xf0;
     if (bcds_len != NULL)
-        *bcds_len = (j + 1) >> 1;
+        *bcds_len = (pt_uint32_t)(j + 1) >> 1;
 
     return bcds;
 }

@@ -13,8 +13,8 @@ pt_int32_t pt_asn1_encode_len(pt_int32_t len, void *buf, pt_int32_t pos)
     }
     else
     {
-        *((pt_uint8_t *)buf + (--pos)) = (pt_uint8_t)(len & 0xff);
-        *((pt_uint8_t *)buf + (--pos)) = (pt_uint8_t)(len >> 8);
+        *((pt_uint8_t *)buf + (--pos)) = (pt_uint8_t)((len & 0xff));
+        *((pt_uint8_t *)buf + (--pos)) = (pt_uint8_t)((len & 0xff00) >> 8);
         *((pt_uint8_t *)buf + (--pos)) = 0x82;
     }
 
@@ -38,7 +38,7 @@ pt_int32_t pt_asn1_encode_tag(pt_uint32_t t, void *buf, pt_int32_t pos)
     pt_bool_t longtag = PT_FALSE;
 
     if ((t & 0xff000000) > 0) {
-        *((pt_uint8_t *)buf + (--pos)) = (pt_uint8_t)((t & 0x00ff0000) >> 24);
+        *((pt_uint8_t *)buf + (--pos)) = (pt_uint8_t)((t & 0xff000000) >> 24);
         longtag = PT_TRUE;
     }
 
@@ -76,7 +76,7 @@ pt_int32_t pt_asn1_encode_v(pt_int32_t l, void *v, void *buf, pt_int32_t pos)
     pos -= l;
     CHECK_RESULT(pos);
 
-    memcpy((pt_uint8_t *)buf + pos, v, l);
+    memcpy((pt_uint8_t *)buf + pos, v, (pt_uint32_t)l);
 
     return pos;
 }
@@ -94,7 +94,7 @@ pt_int32_t pt_asn1_encode_tlv(pt_uint32_t t, pt_int32_t l, void *v, void *buf, p
 
 pt_int32_t pt_asn1_encode_eoc_indef(pt_int32_t l, void *buf, pt_int32_t pos)
 {
-    memmove((pt_uint8_t *)buf + pos - 2, (pt_uint8_t *)buf + pos, l);
+    memmove((pt_uint8_t *)buf + pos - 2, (pt_uint8_t *)buf + pos, (pt_uint32_t)l);
     pos -= 2;
 
     *((pt_uint8_t*)buf + pos + l) = 0x00;
@@ -179,7 +179,7 @@ pt_int32_t pt_asn1_decode_tl(void *buf, pt_int32_t pos, pt_uint32_t *t, pt_int32
 
 pt_int32_t pt_asn1_decode_v(void *buf, pt_int32_t pos, pt_int32_t l, void *v)
 {
-    memcpy(v, (pt_uint8_t*)buf+pos, l);
+    memcpy(v, (pt_uint8_t*)buf+pos, (pt_uint32_t)l);
     pos += l;
 
     return pos;
