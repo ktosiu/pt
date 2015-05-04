@@ -65,8 +65,6 @@ void pt_task_update_ss7_bcd_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_ss7_mat
         return;
     }
 
-    PT_LOG(PTLOG_DEBUG, "there is tag = %#x in msg_data", ss7_uid->asn1_tag);
-
     pos = pt_asn1_decode_tl(msg->msg_data, pos, &t, &l);
 
     sprintf(str_seq, "%lx", seq);
@@ -74,14 +72,11 @@ void pt_task_update_ss7_bcd_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_ss7_mat
     str_uid_len = sizeof(str_uid);
     pt_bcds2str((pt_uint8_t *)ss7_uid->asn1_data, 
             pt_bcdlen((pt_uint8_t *)ss7_uid->asn1_data), str_uid, &str_uid_len);
-    PT_LOG(PTLOG_DEBUG, "there is uid = %s in msg_data, str_seq = %s", str_uid, str_seq);
 
     pt_str_add(str_seq, str_uid, str_result, 10);
-    PT_LOG(PTLOG_DEBUG, "there is bcd add uid = %s in msg_data", str_result);
     
     uid_len = sizeof(uid);
     pt_str2bcds(str_result, (pt_int32_t)strlen(str_result), (pt_uint8_t *)uid, &uid_len);
-    PT_LOG(PTLOG_DEBUG, "there is uid_len  = %d , l = %d, pos = %d in msg_data", uid_len, l, pos);
 
     if (uid_len < l)
         memcpy(msg->msg_data + pos + l - uid_len, uid, uid_len);
