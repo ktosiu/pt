@@ -129,7 +129,7 @@ typedef struct pt_conn_item_s
 extern pt_conn_id_t pt_conn_add(pt_conn_item_t *conn);
 extern void pt_conn_del(pt_conn_id_t conn_id);
 extern pt_conn_status_e pt_conn_status(pt_conn_id_t conn_id);
-extern pt_int32_t pt_conn_send(pt_conn_id_t *conn_id, pt_uint32_t seq, pt_uint8_t *data, pt_uint32_t len);
+extern pt_int32_t pt_conn_send(pt_conn_id_t conn_id, pt_uint32_t seq, pt_uint8_t *data, pt_uint32_t len);
 
 #endif /*_PT_CONN_H*/
 

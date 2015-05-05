@@ -302,7 +302,7 @@ void pt_conn_del(pt_conn_id_t conn_id)
     /*暂时无法解决ST线程删除问题*/
 }
 
-pt_int32_t pt_conn_send(pt_conn_id_t *conn_id, pt_uint32_t seq, pt_uint8_t *data, pt_uint32_t len)
+pt_int32_t pt_conn_send(pt_conn_id_t conn_id, pt_uint32_t seq, pt_uint8_t *data, pt_uint32_t len)
 {
     pt_conn_tcb_t *tcb;
 
