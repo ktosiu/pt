@@ -6,12 +6,12 @@ static gtcap_msg_t _send_gtcap_msg;
 static pt_int32_t _task_ss7_buf_len;
 static pt_uint8_t _task_ss7_buf[MAX_SS7_MSG];
 
-void pt_task_update_ss7_str_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_ss7_matchinfo_t *ss7_uid)
+void pt_task_update_ss7_str_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_matchinfo_t *ss7_uid)
 {
     ;
 }
 
-void pt_task_update_ss7_bytes_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_ss7_matchinfo_t *ss7_uid)
+void pt_task_update_ss7_bytes_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_matchinfo_t *ss7_uid)
 {
     pt_int32_t pos;
     pt_uint32_t t;
@@ -23,9 +23,9 @@ void pt_task_update_ss7_bytes_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_ss7_m
     pt_char_t str_uid[128];
     pt_char_t str_result[128];
 
-    pos = pt_asn1_code_tag_pos(ss7_uid->asn1_tag, msg->msg_data, msg->msg_data_len);
+    pos = pt_asn1_code_tag_pos(ss7_uid->tag, msg->msg_data, msg->msg_data_len);
     if (pos < 0) {
-        PT_LOG(PTLOG_DEBUG, "there is not tag = %#x in msg_data", ss7_uid->asn1_tag);
+        PT_LOG(PTLOG_DEBUG, "there is not tag = %#x in msg_data", ss7_uid->tag);
         return;
     }
 
@@ -34,7 +34,7 @@ void pt_task_update_ss7_bytes_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_ss7_m
     sprintf(str_seq, "%lx", seq);
 
     str_uid_len = sizeof(str_uid);
-    pt_bytes2str((pt_uint8_t *)ss7_uid->asn1_data, ss7_uid->asn1_data_len, str_uid, &str_uid_len);
+    pt_bytes2str((pt_uint8_t *)ss7_uid->data, ss7_uid->data_len, str_uid, &str_uid_len);
 
     pt_str_add(str_seq, str_uid, str_result, 16);
     
@@ -47,7 +47,7 @@ void pt_task_update_ss7_bytes_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_ss7_m
         memcpy(msg->msg_data + pos, &uid[uid_len - l], uid_len);
 }
 
-void pt_task_update_ss7_bcd_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_ss7_matchinfo_t *ss7_uid)
+void pt_task_update_ss7_bcd_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_matchinfo_t *ss7_uid)
 {
     pt_int32_t pos;
     pt_uint32_t t;
@@ -59,9 +59,9 @@ void pt_task_update_ss7_bcd_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_ss7_mat
     pt_char_t str_uid[128];
     pt_char_t str_result[128];
 
-    pos = pt_asn1_code_tag_pos(ss7_uid->asn1_tag, msg->msg_data, msg->msg_data_len);
+    pos = pt_asn1_code_tag_pos(ss7_uid->tag, msg->msg_data, msg->msg_data_len);
     if (pos < 0) {
-        PT_LOG(PTLOG_DEBUG, "there is not tag = %#x in msg_data", ss7_uid->asn1_tag);
+        PT_LOG(PTLOG_DEBUG, "there is not tag = %#x in msg_data", ss7_uid->tag);
         return;
     }
 
@@ -70,8 +70,8 @@ void pt_task_update_ss7_bcd_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_ss7_mat
     sprintf(str_seq, "%lx", seq);
 
     str_uid_len = sizeof(str_uid);
-    pt_bcds2str((pt_uint8_t *)ss7_uid->asn1_data, 
-            pt_bcdlen((pt_uint8_t *)ss7_uid->asn1_data), str_uid, &str_uid_len);
+    pt_bcds2str((pt_uint8_t *)ss7_uid->data, 
+            pt_bcdlen((pt_uint8_t *)ss7_uid->data), str_uid, &str_uid_len);
 
     pt_str_add(str_seq, str_uid, str_result, 10);
     
@@ -91,17 +91,17 @@ void pt_task_update_ss7_uid_with_seq(pt_uc_msg_t *msg, pt_uint64_t seq)
 
     list_for_each(ss7_uid_pos, &msg->list_msg_uid) {
         ss7_uid = list_entry(ss7_uid_pos, pt_uc_matchinfo_t, node);
-        switch(ss7_uid->matchinfo.ss7.asn1_data_type) {
+        switch(ss7_uid->data_type) {
         case PT_UC_DATA_STR:
-            pt_task_update_ss7_str_uid(msg, seq, &ss7_uid->matchinfo.ss7);
+            pt_task_update_ss7_str_uid(msg, seq, ss7_uid);
             break;
         case PT_UC_DATA_IPV4:
         case PT_UC_DATA_IPV6:
         case PT_UC_DATA_BYTE:
-            pt_task_update_ss7_bytes_uid(msg, seq, &ss7_uid->matchinfo.ss7);
+            pt_task_update_ss7_bytes_uid(msg, seq, ss7_uid);
             break;
         case PT_UC_DATA_BCD:
-            pt_task_update_ss7_bcd_uid(msg, seq, &ss7_uid->matchinfo.ss7);
+            pt_task_update_ss7_bcd_uid(msg, seq, ss7_uid);
             break;
         default:
             break;

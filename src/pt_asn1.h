@@ -12,7 +12,7 @@ pt_int32_t pt_asn1_decode_v(void *buf, pt_int32_t pos, pt_int32_t l, void *v);
 pt_int32_t pt_asn1_decode_tlv(void *buf, pt_int32_t pos, pt_uint32_t *t, pt_int32_t *l, void *v);
 
 pt_uint32_t pt_asn1_code_tag(void *buf);
-pt_int32_t pt_asn1_code_tag_pos(pt_uint32_t tag, pt_uint8_t *code, pt_int32_t len);
+pt_int32_t pt_asn1_code_tag_pos(pt_char_t *strtag, pt_uint8_t *code, pt_int32_t len);
 
 #endif
 

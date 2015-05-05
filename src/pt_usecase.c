@@ -150,51 +150,6 @@ void pt_uc_del_msg(pt_uc_msg_id_t msg_id)
     pt_uc_free_msg(msg);
 }
 
-void pt_uc_parser_diam_msg_strtag(char *strtag, pt_uint32_t *tag_num, pt_uint32_t *tag, pt_uint32_t *tag_pos)
-{
-    pt_int32_t pos;
-    pt_char_t tmp[64];
-
-    *tag_num = 0;
-
-    while(*strtag) {
-        pos = 0;
-        while (isdigit(*strtag)) {
-            tmp[pos++] = *strtag;
-            strtag++;
-        }
-        tmp[pos] = 0;
-        tag[*tag_num] = (pt_uint32_t)atoi(tmp);
-
-        if (*strtag == '[') {
-            strtag++;
-            pos = 0;
-            while (isdigit(*strtag)) {
-                tmp[pos++] = *strtag;
-                strtag++;
-            }
-            if (*strtag != ']') {
-                *tag_num = 0;
-                return;
-            } else {
-                strtag++;
-            }
-            tmp[pos] = 0;
-            tag_pos[*tag_num] = (pt_uint32_t)atoi(tmp);
-        } else {
-            tag_pos[*tag_num] = 1;
-        }
-
-        if (*strtag && *strtag != '.') {
-            *tag_num = 0;
-            return;
-        } else if (*strtag == '.') { 
-            strtag++;
-        }
-        (*tag_num)++;
-    }
-}
-
 void pt_uc_set_msg_linkid(pt_uc_msg_id_t msg_id, pt_uint32_t msg_link_id)
 {
     pt_uc_msg_t *msg;
@@ -204,7 +159,7 @@ void pt_uc_set_msg_linkid(pt_uc_msg_id_t msg_id, pt_uint32_t msg_link_id)
     msg->msg_link_id = msg_link_id;
 }
 
-void pt_uc_set_ss7_msg_param(pt_uc_msg_id_t msg_id, 
+void pt_uc_set_msg_param_ss7(pt_uc_msg_id_t msg_id, 
                 pt_uint8_t acver, pt_uint8_t acvalue, pt_uint8_t comptype, pt_uint8_t opcode,
                 pt_char_t *cda_code, pt_uint8_t cda_ssn, pt_char_t *cga_code, pt_uint8_t cga_ssn)
 {
@@ -221,8 +176,8 @@ void pt_uc_set_ss7_msg_param(pt_uc_msg_id_t msg_id,
     pt_str2bcds(cga_code, strlen(cga_code), msg->msg_ss7_cga_code, NULL);
 }
 
-void pt_uc_add_diam_matchinfo(list_head_t *plist, 
-                pt_int32_t uid_type, pt_char_t *uid, pt_int32_t uid_len, 
+void pt_uc_add_matchinfo(list_head_t *plist, 
+                pt_int32_t data_type, pt_char_t *data, pt_int32_t data_len, 
                 pt_char_t *strtag)
 {
     pt_uc_matchinfo_t *matchinfo;
@@ -234,84 +189,35 @@ void pt_uc_add_diam_matchinfo(list_head_t *plist,
     }
     memset(matchinfo, 0, sizeof(pt_uc_matchinfo_t));
 
-    pt_uc_parser_diam_msg_strtag(strtag, 
-            &matchinfo->matchinfo.diam.avp_condition.avp_level_num, 
-            matchinfo->matchinfo.diam.avp_condition.avp_code, 
-            matchinfo->matchinfo.diam.avp_condition.avp_position);
-
-    matchinfo->matchinfo.diam.avp_data_type = uid_type;
-    memcpy(matchinfo->matchinfo.diam.avp_data, uid, (pt_uint32_t)uid_len);
-    matchinfo->matchinfo.diam.avp_data_len = uid_len;
+    strcpy(matchinfo->tag, strtag);
+    matchinfo->data_type = data_type;
+    memcpy(matchinfo->data, data, (pt_uint32_t)data_len);
+    matchinfo->data_len = data_len;
     
     list_add_tail(&matchinfo->node, plist);
 }
 
-void pt_uc_add_diam_msg_uid(pt_uc_msg_id_t msg_id, 
+void pt_uc_add_msg_uid(pt_uc_msg_id_t msg_id, 
                 pt_int32_t uid_type, pt_char_t *uid, pt_int32_t uid_len, 
                 pt_char_t *strtag)
 {
-    pt_uc_add_diam_matchinfo(&((pt_uc_msg_t *)msg_id)->list_msg_uid,
+    pt_uc_add_matchinfo(&((pt_uc_msg_t *)msg_id)->list_msg_uid,
             uid_type, uid, uid_len, strtag);
 }
 
-void pt_uc_add_diam_msg_replace(pt_uc_msg_id_t msg_id, 
+void pt_uc_add_msg_replace(pt_uc_msg_id_t msg_id, 
                 pt_int32_t replace_type, pt_char_t *replace, pt_int32_t replace_len, 
                 pt_char_t *strtag)
 {
-    pt_uc_add_diam_matchinfo(&((pt_uc_msg_t *)msg_id)->list_msg_replace,
+    pt_uc_add_matchinfo(&((pt_uc_msg_t *)msg_id)->list_msg_replace,
             replace_type, replace, replace_len, strtag);
 }
 
-void pt_uc_add_diam_msg_condition(pt_uc_msg_id_t msg_id, 
+void pt_uc_add_msg_condition(pt_uc_msg_id_t msg_id, 
                 pt_int32_t condition_type, pt_char_t *condition, pt_int32_t condition_len, 
                 pt_char_t *strtag)
 {
-    pt_uc_add_diam_matchinfo(&((pt_uc_msg_t *)msg_id)->list_msg_condition,
-                condition_type, condition, condition_len, strtag);
-}
-
-void pt_uc_add_ss7_matchinfo(list_head_t *plist, 
-                pt_int32_t uid_type, pt_char_t *uid, pt_int32_t uid_len, 
-                pt_char_t *strtag)
-{
-    pt_uc_matchinfo_t *matchinfo;
-
-    matchinfo = pt_malloc(sizeof(pt_uc_matchinfo_t));
-    if (matchinfo == NULL) {
-        PT_LOG(PTLOG_ERROR, "malloc uid buffer failed!");
-        return;
-    }
-    memset(matchinfo, 0, sizeof(pt_uc_matchinfo_t));
-
-    matchinfo->matchinfo.ss7.asn1_tag = atoi(strtag);
-    matchinfo->matchinfo.ss7.asn1_data_type = uid_type;
-    memcpy(matchinfo->matchinfo.ss7.asn1_data, uid, (pt_uint32_t)uid_len);
-    matchinfo->matchinfo.ss7.asn1_data_len = uid_len;
-    
-    list_add_tail(&matchinfo->node, plist);
-}
-
-void pt_uc_add_ss7_msg_uid(pt_uc_msg_id_t msg_id, 
-                pt_int32_t uid_type, pt_char_t *uid, pt_int32_t uid_len, 
-                pt_char_t *strtag)
-{
-    pt_uc_add_ss7_matchinfo(&((pt_uc_msg_t *)msg_id)->list_msg_uid,
-            uid_type, uid, uid_len, strtag);
-}
-
-void pt_uc_add_ss7_msg_replace(pt_uc_msg_id_t msg_id, 
-                pt_int32_t replace_type, pt_char_t *replace, pt_int32_t replace_len, 
-                pt_char_t *strtag)
-{
-    pt_uc_add_ss7_matchinfo(&((pt_uc_msg_t *)msg_id)->list_msg_replace,
-            replace_type, replace, replace_len, strtag);
-}
-
-void pt_uc_add_ss7_msg_condition(pt_uc_msg_id_t msg_id, 
-                pt_int32_t condition_type, pt_char_t *condition, pt_int32_t condition_len, 
-                pt_char_t *strtag)
-{
-    pt_uc_add_ss7_matchinfo(&((pt_uc_msg_t *)msg_id)->list_msg_condition,
+    pt_uc_add_matchinfo(&((pt_uc_msg_t *)msg_id)->list_msg_condition,
                 condition_type, condition, condition_len, strtag);
 }
 

@@ -60,25 +60,12 @@ typedef enum {
 }pt_uc_data_type;
 
 typedef struct {
-    avp_condition_t     avp_condition;
-    pt_uc_data_type     avp_data_type;
-    pt_int32_t          avp_data_len;
-    pt_char_t           avp_data[1024];
-}pt_uc_diam_matchinfo_t;
-
-typedef struct {
-    pt_uint32_t         asn1_tag;
-    pt_uc_data_type     asn1_data_type;
-    pt_int32_t          asn1_data_len;
-    pt_char_t           asn1_data[1024];
-}pt_uc_ss7_matchinfo_t;
-
-typedef struct {
     list_head_t         node;
-    union {
-        pt_uc_diam_matchinfo_t diam;
-        pt_uc_ss7_matchinfo_t ss7;
-    }matchinfo;
+
+    pt_char_t           tag[128];
+    pt_uc_data_type     data_type;
+    pt_int32_t          data_len;
+    pt_char_t           data[1024];
 }pt_uc_matchinfo_t;
 
 #define PT_UC_MSG_SS7_INVOKE    0
@@ -137,25 +124,16 @@ pt_uc_msg_id_t pt_uc_add_msg(pt_uc_inst_id_t inst_id,
                     pt_char_t *msg_name, pt_int32_t msg_action, pt_int32_t msg_type, 
                     pt_uint8_t *msg_data, pt_int32_t msg_data_len);
 void pt_uc_set_msg_linkid(pt_uc_msg_id_t msg_id, pt_uint32_t msg_link_id);
-void pt_uc_set_ss7_msg_param(pt_uc_msg_id_t msg_id, 
+void pt_uc_set_msg_param_ss7(pt_uc_msg_id_t msg_id, 
                 pt_uint8_t acver, pt_uint8_t acvalue, pt_uint8_t comptype, pt_uint8_t opcode,
                 pt_char_t *cda_code, pt_uint8_t cda_ssn, pt_char_t *cga_code, pt_uint8_t cga_ssn);
-void pt_uc_add_diam_msg_uid(pt_uc_msg_id_t msg_id, 
+void pt_uc_add_msg_uid(pt_uc_msg_id_t msg_id, 
                 pt_int32_t uid_type, pt_char_t *uid, pt_int32_t uid_len, 
                 pt_char_t *strtag);
-void pt_uc_add_diam_msg_replace(pt_uc_msg_id_t msg_id, 
+void pt_uc_add_msg_replace(pt_uc_msg_id_t msg_id, 
                 pt_int32_t replace_type, pt_char_t *replace, pt_int32_t replace_len, 
                 pt_char_t *strtag);
-void pt_uc_add_diam_msg_condition(pt_uc_msg_id_t msg_id, 
-                pt_int32_t condition_type, pt_char_t *condition, pt_int32_t condition_len, 
-                pt_char_t *strtag);
-void pt_uc_add_ss7_msg_uid(pt_uc_msg_id_t msg_id, 
-                pt_int32_t uid_type, pt_char_t *uid, pt_int32_t uid_len, 
-                pt_char_t *strtag);
-void pt_uc_add_ss7_msg_replace(pt_uc_msg_id_t msg_id, 
-                pt_int32_t replace_type, pt_char_t *replace, pt_int32_t replace_len, 
-                pt_char_t *strtag);
-void pt_uc_add_ss7_msg_condition(pt_uc_msg_id_t msg_id, 
+void pt_uc_add_msg_condition(pt_uc_msg_id_t msg_id, 
                 pt_int32_t condition_type, pt_char_t *condition, pt_int32_t condition_len, 
                 pt_char_t *strtag);
 

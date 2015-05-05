@@ -536,7 +536,7 @@ static pt_int32_t pt_xml_load_uc_matchinfo(xmlDocPtr doc, xmlNodePtr cur,
     return 0;
 }
 
-pt_int32_t pt_xml_load_uc_diam_msg_uid(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msg_id_t msg_id)
+pt_int32_t pt_xml_load_uc_msg_uid(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msg_id_t msg_id)
 {
     pt_char_t strtag[64];
     pt_int32_t type;
@@ -548,12 +548,12 @@ pt_int32_t pt_xml_load_uc_diam_msg_uid(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msg_
         return -0xff;
     }
 
-    pt_uc_add_diam_msg_uid(msg_id, type, (pt_char_t *)data, data_len, strtag);
+    pt_uc_add_msg_uid(msg_id, type, (pt_char_t *)data, data_len, strtag);
 
     return 0;
 }
 
-pt_int32_t pt_xml_load_uc_diam_msg_replace(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msg_id_t msg_id)
+pt_int32_t pt_xml_load_uc_msg_replace(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msg_id_t msg_id)
 {
     pt_char_t strtag[64];
     pt_int32_t type;
@@ -565,12 +565,12 @@ pt_int32_t pt_xml_load_uc_diam_msg_replace(xmlDocPtr doc, xmlNodePtr cur, pt_uc_
         return -0xff;
     }
 
-    pt_uc_add_diam_msg_replace(msg_id, type, (pt_char_t *)data, data_len, strtag);
+    pt_uc_add_msg_replace(msg_id, type, (pt_char_t *)data, data_len, strtag);
 
     return 0;
 }
 
-pt_int32_t pt_xml_load_uc_diam_msg_condition(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msg_id_t msg_id)
+pt_int32_t pt_xml_load_uc_msg_condition(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msg_id_t msg_id)
 {
     pt_char_t strtag[64];
     pt_int32_t type;
@@ -582,7 +582,7 @@ pt_int32_t pt_xml_load_uc_diam_msg_condition(xmlDocPtr doc, xmlNodePtr cur, pt_u
         return -0xff;
     }
 
-    pt_uc_add_diam_msg_condition(msg_id, type, (pt_char_t *)data, data_len, strtag);
+    pt_uc_add_msg_condition(msg_id, type, (pt_char_t *)data, data_len, strtag);
 
     return 0;
 }
@@ -605,67 +605,16 @@ pt_int32_t pt_xml_load_uc_diam_msg_para(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msg
     while (cur != NULL) {
         if (xmlStrEqual(cur->name, (const xmlChar *)"uid")) {
             PT_LOG(PTLOG_DEBUG, "load msg uid.");
-            pt_xml_load_uc_diam_msg_uid(doc, cur, msg_id);
+            pt_xml_load_uc_msg_uid(doc, cur, msg_id);
         } else if (xmlStrEqual(cur->name, (const xmlChar *)"replace")) {
             PT_LOG(PTLOG_DEBUG, "load msg replace.");
-            pt_xml_load_uc_diam_msg_replace(doc, cur, msg_id);
+            pt_xml_load_uc_msg_replace(doc, cur, msg_id);
         } else if (xmlStrEqual(cur->name, (const xmlChar *)"condition")) {
             PT_LOG(PTLOG_DEBUG, "load msg condition.");
-            pt_xml_load_uc_diam_msg_condition(doc, cur, msg_id);
+            pt_xml_load_uc_msg_condition(doc, cur, msg_id);
         }
         cur = cur->next;
     }
-
-    return 0;
-}
-
-pt_int32_t pt_xml_load_uc_ss7_msg_uid(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msg_id_t msg_id)
-{
-    pt_char_t strtag[64];
-    pt_int32_t type;
-    pt_uint8_t data[1024];
-    pt_int32_t data_len;
-
-    if (pt_xml_load_uc_matchinfo(doc, cur, strtag, &type, data, &data_len) < 0) {
-        PT_LOG(PTLOG_ERROR, "load uid failed!");
-        return -0xff;
-    }
-
-    pt_uc_add_ss7_msg_uid(msg_id, type, (pt_char_t *)data, data_len, strtag);
-
-    return 0;
-}
-
-pt_int32_t pt_xml_load_uc_ss7_msg_replace(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msg_id_t msg_id)
-{
-    pt_char_t strtag[64];
-    pt_int32_t type;
-    pt_uint8_t data[1024];
-    pt_int32_t data_len;
-
-    if (pt_xml_load_uc_matchinfo(doc, cur, strtag, &type, data, &data_len) < 0) {
-        PT_LOG(PTLOG_ERROR, "load replace failed!");
-        return -0xff;
-    }
-
-    pt_uc_add_ss7_msg_replace(msg_id, type, (pt_char_t *)data, data_len, strtag);
-
-    return 0;
-}
-
-pt_int32_t pt_xml_load_uc_ss7_msg_condition(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msg_id_t msg_id)
-{
-    pt_char_t strtag[64];
-    pt_int32_t type;
-    pt_uint8_t data[1024];
-    pt_int32_t data_len;
-
-    if (pt_xml_load_uc_matchinfo(doc, cur, strtag, &type, data, &data_len) < 0) {
-        PT_LOG(PTLOG_ERROR, "load replace failed!");
-        return -0xff;
-    }
-
-    pt_uc_add_ss7_msg_condition(msg_id, type, (pt_char_t *)data, data_len, strtag);
 
     return 0;
 }
@@ -751,20 +700,20 @@ pt_int32_t pt_xml_load_uc_ss7_msg_para(xmlDocPtr doc, xmlNodePtr cur, pt_uc_msg_
         xmlFree(prop);
     }
 
-    pt_uc_set_ss7_msg_param(msg_id, acver, acvalue, comptype, opcode,
+    pt_uc_set_msg_param_ss7(msg_id, acver, acvalue, comptype, opcode,
                     cda_code, cda_ssn, cga_code, cga_ssn);
 
     cur = cur->xmlChildrenNode;
     while (cur != NULL) {
         if (xmlStrEqual(cur->name, (const xmlChar *)"uid")) {
             PT_LOG(PTLOG_DEBUG, "load msg uid.");
-            pt_xml_load_uc_ss7_msg_uid(doc, cur, msg_id);
+            pt_xml_load_uc_msg_uid(doc, cur, msg_id);
         } else if (xmlStrEqual(cur->name, (const xmlChar *)"replace")) {
             PT_LOG(PTLOG_DEBUG, "load msg replace.");
-            pt_xml_load_uc_ss7_msg_replace(doc, cur, msg_id);
+            pt_xml_load_uc_msg_replace(doc, cur, msg_id);
         } else if (xmlStrEqual(cur->name, (const xmlChar *)"condition")) {
             PT_LOG(PTLOG_DEBUG, "load msg condition.");
-            pt_xml_load_uc_ss7_msg_condition(doc, cur, msg_id);
+            pt_xml_load_uc_msg_condition(doc, cur, msg_id);
         }
         cur = cur->next;
     }

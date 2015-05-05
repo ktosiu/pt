@@ -13,13 +13,7 @@ void pt_task_update_diam_hopbyhop(pt_uc_msg_t *msg, pt_uint32_t hopbyhop)
 /*直接替换用例中的SID*/
 void pt_task_update_diam_sid(pt_uc_msg_t *msg, pt_char_t *sid, pt_int32_t sid_len)
 {
-    avp_condition_t avp_condition;
-
-    avp_condition.avp_level_num = 1;
-    avp_condition.avp_position[0] = 1;
-    avp_condition.avp_code[0] = 263;
-    
-    pt_diam_set_avp_data(msg->msg_data, &msg->msg_data_len, &avp_condition, sid, sid_len);
+    pt_diam_set_avp_data(msg->msg_data, &msg->msg_data_len, "263[1]", sid, sid_len);
 }
 
 /*根据用例中的sid和seq生成SID*/
@@ -52,7 +46,7 @@ void pt_task_update_diam_sid_with_seq(pt_uc_msg_t *msg,
  * eg. 460010000000000@pt.com --> 460010000000000
  * eg. 460010000000000 --> 460010000000000
  */
-void pt_task_update_diam_str_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_diam_matchinfo_t *diam_uid)
+void pt_task_update_diam_str_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_matchinfo_t *diam_uid)
 {
     pt_int32_t uid_len;
     pt_int32_t i;
@@ -63,7 +57,7 @@ void pt_task_update_diam_str_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_diam_m
     pt_char_t str_result[128];
     pt_char_t *pstr;
 
-    pstr = diam_uid->avp_data;
+    pstr = diam_uid->data;
     for(i = 0; pstr[i]; i++) {
         if (isdigit(pstr[i]))
             break;
@@ -86,10 +80,10 @@ void pt_task_update_diam_str_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_diam_m
     /*uid构造*/
     uid_len = sprintf(uid, "%s%s%s", str_prefix, str_result, pstr);
 
-    pt_diam_set_avp_data(msg->msg_data, &msg->msg_data_len, &diam_uid->avp_condition, uid, uid_len);
+    pt_diam_set_avp_data(msg->msg_data, &msg->msg_data_len, diam_uid->tag, uid, uid_len);
 }
 
-void pt_task_update_diam_bytes_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_diam_matchinfo_t *diam_uid)
+void pt_task_update_diam_bytes_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_matchinfo_t *diam_uid)
 {
     pt_int32_t uid_len;
     pt_char_t uid[128];
@@ -101,17 +95,17 @@ void pt_task_update_diam_bytes_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_diam
     sprintf(str_seq, "%lx", seq);
 
     str_uid_len = sizeof(str_uid);
-    pt_bytes2str((pt_uint8_t *)diam_uid->avp_data, diam_uid->avp_data_len, str_uid, &str_uid_len);
+    pt_bytes2str((pt_uint8_t *)diam_uid->data, diam_uid->data_len, str_uid, &str_uid_len);
 
     pt_str_add(str_seq, str_uid, str_result, 16);
     
     uid_len = sizeof(uid);
     pt_str2bytes(str_result, (pt_int32_t)strlen(str_result), (pt_uint8_t *)uid, &uid_len);
 
-    pt_diam_set_avp_data(msg->msg_data, &msg->msg_data_len, &diam_uid->avp_condition, uid, uid_len);
+    pt_diam_set_avp_data(msg->msg_data, &msg->msg_data_len, diam_uid->tag, uid, uid_len);
 }
 
-void pt_task_update_diam_bcd_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_diam_matchinfo_t *diam_uid)
+void pt_task_update_diam_bcd_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_matchinfo_t *diam_uid)
 {
     ;
 }
@@ -123,17 +117,17 @@ void pt_task_update_diam_uid_with_seq(pt_uc_msg_t *msg, pt_uint64_t seq)
     
     list_for_each(diam_uid_pos, &msg->list_msg_uid) {
         diam_uid = list_entry(diam_uid_pos, pt_uc_matchinfo_t, node);
-        switch(diam_uid->matchinfo.diam.avp_data_type) {
+        switch(diam_uid->data_type) {
         case PT_UC_DATA_STR:
-            pt_task_update_diam_str_uid(msg, seq, &diam_uid->matchinfo.diam);
+            pt_task_update_diam_str_uid(msg, seq, diam_uid);
             break;
         case PT_UC_DATA_IPV4:
         case PT_UC_DATA_IPV6:
         case PT_UC_DATA_BYTE:
-            pt_task_update_diam_bytes_uid(msg, seq, &diam_uid->matchinfo.diam);
+            pt_task_update_diam_bytes_uid(msg, seq, diam_uid);
             break;
         case PT_UC_DATA_BCD:
-            pt_task_update_diam_bcd_uid(msg, seq, &diam_uid->matchinfo.diam);
+            pt_task_update_diam_bcd_uid(msg, seq, diam_uid);
             break;
         default:
             break;
@@ -151,14 +145,17 @@ void pt_task_update_diam_uid_with_msgdata(pt_uc_msg_t *msg, pt_uint8_t *msg_data
 
     list_for_each(diam_uid_pos, &msg->list_msg_uid) {
         diam_uid = list_entry(diam_uid_pos, pt_uc_matchinfo_t, node);
-        pos = pt_diam_get_avp_pos(msg_data, msg_data_len, &diam_uid->matchinfo.diam.avp_condition);
+        pos = pt_diam_get_avp_pos(msg_data, msg_data_len, diam_uid->tag, NULL);
         if (pos < 0)
             continue;
 
         avp_data = pt_diam_get_avp_data(msg_data, pos);
         avp_data_len = pt_diam_get_avp_data_len(msg_data, pos);
-        pt_diam_set_avp_data(msg->msg_data, &msg->msg_data_len, 
-                &diam_uid->matchinfo.diam.avp_condition, avp_data, avp_data_len);
+        pt_diam_set_avp_data(msg->msg_data, 
+                &msg->msg_data_len, 
+                diam_uid->tag,
+                avp_data,
+                avp_data_len);
     }
 }
 
@@ -175,9 +172,9 @@ void pt_task_update_diam_replace(pt_uc_msg_t *msg)
         diam_replace = list_entry(diam_replace_pos, pt_uc_matchinfo_t, node);
         pt_diam_set_avp_data(msg->msg_data, 
                 &msg->msg_data_len, 
-                &diam_replace->matchinfo.diam.avp_condition, 
-                diam_replace->matchinfo.diam.avp_data, 
-                diam_replace->matchinfo.diam.avp_data_len);
+                diam_replace->tag, 
+                diam_replace->data, 
+                diam_replace->data_len);
     }
 }
 
@@ -199,15 +196,15 @@ pt_bool_t pt_task_match_diam_msg(pt_uc_msg_t *msg, pt_uint8_t *data, pt_int32_t 
     /*自定义条件*/
     list_for_each(diam_condition_pos, &msg->list_msg_condition) {
         diam_condition = list_entry(diam_condition_pos, pt_uc_matchinfo_t, node);
-        pos = pt_diam_get_avp_pos(data, len, &diam_condition->matchinfo.diam.avp_condition); 
+        pos = pt_diam_get_avp_pos(data, len, diam_condition->tag, NULL); 
         if (pos < 0)
             return PT_FALSE;
 
-        if (diam_condition->matchinfo.diam.avp_data_len != pt_diam_get_avp_data_len(data, pos))
+        if (diam_condition->data_len != pt_diam_get_avp_data_len(data, pos))
             return PT_FALSE;
 
-        if (memcmp(diam_condition->matchinfo.diam.avp_data, pt_diam_get_avp_data(data, pos), 
-                    (pt_uint32_t)diam_condition->matchinfo.diam.avp_data_len))
+        if (memcmp(diam_condition->data, pt_diam_get_avp_data(data, pos), 
+                    (pt_uint32_t)diam_condition->data_len))
             return PT_FALSE;
     }
 

@@ -210,12 +210,14 @@ pt_uint32_t pt_asn1_code_tag(void *buf)
     return t;
 }
 
-pt_int32_t pt_asn1_code_tag_pos(pt_uint32_t tag, pt_uint8_t *code, pt_int32_t len)
+pt_int32_t pt_asn1_code_tag_pos(pt_char_t *strtag, pt_uint8_t *code, pt_int32_t len)
 {
     pt_int32_t pos = 0, tmp;
     pt_uint32_t t;
     pt_int32_t l;
+    pt_uint32_t tag;
 
+    tag = (pt_uint32_t)atoi(strtag);
     while (pos < len) {
         tmp = pos;
 
@@ -227,7 +229,7 @@ pt_int32_t pt_asn1_code_tag_pos(pt_uint32_t tag, pt_uint8_t *code, pt_int32_t le
             tmp = pos;
 
             /*嵌套递归*/
-            pos = pt_asn1_code_tag_pos(tag, code + pos, l);
+            pos = pt_asn1_code_tag_pos(strtag, code + pos, l);
             if (-1 != pos)
                 return tmp + pos;
 

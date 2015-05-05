@@ -30,9 +30,9 @@ pt_uint8_t *pt_diam_get_avp_data(pt_uint8_t *code, pt_int32_t pos);
 pt_int32_t pt_diam_get_avp_data_len(pt_uint8_t *code, pt_int32_t pos);
 pt_int32_t pt_diam_get_avp_pos_from_cmd_data(pt_uint8_t *cmd_data, pt_int32_t cmd_len, pt_uint32_t avp_code, pt_uint32_t avp_position);
 
-pt_int32_t pt_diam_del_avp(pt_uint8_t *code, pt_int32_t *len, avp_condition_t *avp_condition);
-pt_int32_t pt_diam_get_avp_pos(pt_uint8_t *code, pt_int32_t len, avp_condition_t *avp_condition);
-pt_int32_t pt_diam_set_avp_data(pt_uint8_t *code, pt_int32_t *len, avp_condition_t *avp_condition, void *avp_value, pt_int32_t avp_value_len);
+pt_int32_t pt_diam_del_avp(pt_uint8_t *code, pt_int32_t *len, pt_char_t *strtag);
+pt_int32_t pt_diam_get_avp_pos(pt_uint8_t *code, pt_int32_t len, pt_char_t *strtag, diam_condition_t *condition);
+pt_int32_t pt_diam_set_avp_data(pt_uint8_t *code, pt_int32_t *len, pt_char_t *strtag, void *avp_data, pt_int32_t avp_data_len);
 
 /*diam_link.c*/
 diam_conn_t *pt_diam_obtain_overload_conn(pt_uint32_t link_id);

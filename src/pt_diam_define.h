@@ -133,15 +133,16 @@ typedef struct diam_buf_tag
     avp_t         avp;
 } diam_buf_t;
 
-#define MAX_AVP_LEVEL 5
-typedef struct {
-    pt_uint32_t avp_level_num;
-    pt_uint32_t avp_code[MAX_AVP_LEVEL];
-    pt_uint32_t avp_position[MAX_AVP_LEVEL];
 
-    /*通过API获取*/
-    pt_int32_t  avp_pos[MAX_AVP_LEVEL];
-}avp_condition_t;
+#define DIAM_MAX_LEVEL 5
+typedef struct {
+    pt_uint32_t tag_num;
+    pt_uint32_t tag[DIAM_MAX_LEVEL];
+    pt_uint32_t tag_pos[DIAM_MAX_LEVEL];
+
+    /*通过API获取tag在码流中的位置*/
+    pt_int32_t  code_pos[DIAM_MAX_LEVEL];
+} diam_condition_t;
 
 
 typedef struct diam_cfg_info_tag
@@ -193,7 +194,7 @@ typedef struct diam_bear_info_tag
     /*statistic*/
     pt_uint64_t         stat_recv;
     pt_uint64_t         stat_send;
-}diam_conn_t;
+} diam_conn_t;
 
 #endif
 

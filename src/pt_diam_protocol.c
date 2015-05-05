@@ -2,6 +2,51 @@
 
 /*lint -save -e715 -e701*/
 
+void pt_diam_parser_strtag(char *strtag, diam_condition_t *condition)
+{
+    pt_int32_t pos;
+    pt_char_t tmp[64];
+
+    condition->tag_num = 0;
+
+    while(*strtag) {
+        pos = 0;
+        while (isdigit(*strtag)) {
+            tmp[pos++] = *strtag;
+            strtag++;
+        }
+        tmp[pos] = 0;
+        condition->tag[condition->tag_num] = (pt_uint32_t)atoi(tmp);
+
+        if (*strtag == '[') {
+            strtag++;
+            pos = 0;
+            while (isdigit(*strtag)) {
+                tmp[pos++] = *strtag;
+                strtag++;
+            }
+            if (*strtag != ']') {
+                condition->tag_num = 0;
+                return;
+            } else {
+                strtag++;
+            }
+            tmp[pos] = 0;
+            condition->tag_pos[condition->tag_num] = (pt_uint32_t)atoi(tmp);
+        } else {
+            condition->tag_pos[condition->tag_num] = 1;
+        }
+
+        if (*strtag && *strtag != '.') {
+            condition->tag_num = 0;
+            return;
+        } else if (*strtag == '.') { 
+            strtag++;
+        }
+        condition->tag_num++;
+    }
+}
+
 void pt_diam_prn_avps(list_head_t *avps)
 {
     diam_buf_t  *buf;
@@ -372,26 +417,32 @@ pt_int32_t pt_diam_get_avp_pos_from_cmd_data(pt_uint8_t *cmd_data, pt_int32_t cm
 }
 
 /*获取多层AVP位置*/
-pt_int32_t pt_diam_get_avp_pos(pt_uint8_t *code, pt_int32_t len, avp_condition_t *avp_condition)
+pt_int32_t pt_diam_get_avp_pos(pt_uint8_t *code, pt_int32_t len, pt_char_t *strtag, diam_condition_t *condition)
 {
     pt_int32_t pos;
     pt_int32_t avp_pos;
     pt_uint32_t i;
     pt_int32_t cmd_data_len;
     pt_uint8_t *cmd_data;
+    diam_condition_t tmp_condition;
 
     cmd_data_len = pt_diam_get_cmd_data_len(code, len);
     cmd_data = pt_diam_get_cmd_data(code, len);
 
+    if (condition == NULL)
+        condition = &tmp_condition;
+
+    pt_diam_parser_strtag(strtag, condition);
+
     pos = DIM_HDR_LEN;
-    for (i = 0; i < avp_condition->avp_level_num; i++) {
+    for (i = 0; i < condition->tag_num; i++) {
         avp_pos = pt_diam_get_avp_pos_from_cmd_data(cmd_data, cmd_data_len, 
-                        avp_condition->avp_code[i], avp_condition->avp_position[i]);
+                        condition->tag[i], condition->tag_pos[i]);
         if (avp_pos < 0) {
             return -1;
         }
         pos += avp_pos;
-        avp_condition->avp_pos[i] = pos;
+        condition->code_pos[i] = pos;
         
         cmd_data_len = pt_diam_get_avp_len(code, pos);
         cmd_data = pt_diam_get_avp_data(code, pos);
@@ -402,22 +453,23 @@ pt_int32_t pt_diam_get_avp_pos(pt_uint8_t *code, pt_int32_t len, avp_condition_t
             pos += 8;
     }
     
-    return avp_condition->avp_pos[i - 1];   
+    return condition->code_pos[i - 1];   
 }
 
-pt_int32_t pt_diam_del_avp(pt_uint8_t *code, pt_int32_t *len, avp_condition_t *avp_condition)
+pt_int32_t pt_diam_del_avp(pt_uint8_t *code, pt_int32_t *len, pt_char_t *strtag)
 {
     pt_int32_t tmp;
     pt_int32_t pos;
     pt_uint32_t avp_level;
     pt_int32_t avp_offset;
+    diam_condition_t condition;
     
-    if (pt_diam_get_avp_pos(code, *len, avp_condition) < 0) 
+    if (pt_diam_get_avp_pos(code, *len, strtag, &condition) < 0) 
         return -1;
 
-    avp_level = avp_condition->avp_level_num;
+    avp_level = condition.tag_num;
     avp_level--;
-    pos = avp_condition->avp_pos[avp_level];
+    pos = condition.code_pos[avp_level];
 
     avp_offset = (pt_diam_get_avp_len(code, pos) + 3) & (~3);
     memmove(&code[pos], &code[pos + avp_offset], /*lint !e679*/
@@ -426,7 +478,7 @@ pt_int32_t pt_diam_del_avp(pt_uint8_t *code, pt_int32_t *len, avp_condition_t *a
     /*update parent avp len*/
     while (avp_level > 0) {
         avp_level--;
-        pos = avp_condition->avp_pos[avp_level];
+        pos = condition.code_pos[avp_level];
 
         tmp = pt_diam_get_avp_len(code, pos) - avp_offset;
         
@@ -441,7 +493,7 @@ pt_int32_t pt_diam_del_avp(pt_uint8_t *code, pt_int32_t *len, avp_condition_t *a
     return 0;
 }
 
-pt_int32_t pt_diam_set_avp_data(pt_uint8_t *code, pt_int32_t *len, avp_condition_t *avp_condition, 
+pt_int32_t pt_diam_set_avp_data(pt_uint8_t *code, pt_int32_t *len, pt_char_t *strtag, 
                             void *avp_data, pt_int32_t avp_data_len)
 
 {
@@ -451,14 +503,15 @@ pt_int32_t pt_diam_set_avp_data(pt_uint8_t *code, pt_int32_t *len, avp_condition
     pt_uint8_t *old_avp_data;
     pt_int32_t old_avp_offset;
     pt_int32_t new_avp_offset;
+    diam_condition_t condition;
     
-    if (pt_diam_get_avp_pos(code, *len, avp_condition) < 0) 
+    if (pt_diam_get_avp_pos(code, *len, strtag, &condition) < 0) 
         return -1;
 
     /*alignment avp data*/
-    avp_level = avp_condition->avp_level_num;
+    avp_level = condition.tag_num;
     avp_level--;
-    pos = avp_condition->avp_pos[avp_level];
+    pos = condition.code_pos[avp_level];
 
     old_avp_offset = (pt_diam_get_avp_len(code, pos) + 3) & (~3);
 
@@ -489,7 +542,7 @@ pt_int32_t pt_diam_set_avp_data(pt_uint8_t *code, pt_int32_t *len, avp_condition
     /*update parent avp len*/
     while (avp_level > 0) {
         avp_level--;
-        pos = avp_condition->avp_pos[avp_level];
+        pos = condition.code_pos[avp_level];
 
         tmp = pt_diam_get_avp_len(code, pos) + (new_avp_offset - old_avp_offset);
         
