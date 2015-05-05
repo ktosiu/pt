@@ -282,7 +282,7 @@ void pt_task_start(pt_uc_msgflow_id_t msgflow_id, pt_uint64_t count, pt_uint64_t
         if (msgflow_id != msgflow)
             continue;
 
-        if (msgflow->runing_state == RUNING || msgflow->runing_state == PAUSE) {
+        if (msgflow->runing_state == RUNNING || msgflow->runing_state == PAUSE) {
             PT_LOG(PTLOG_ERROR, "already in executing, runing_state = %d, sgflow_name = %s.", 
                 msgflow->runing_state, msgflow->msgflow_name);
             break;
@@ -320,7 +320,7 @@ void pt_task_start(pt_uc_msgflow_id_t msgflow_id, pt_uint64_t count, pt_uint64_t
             PT_LOG(PTLOG_ERROR, "create st thread failed, msgflow_name = %s, inst_name = %s.",
                 msgflow->msgflow_name, inst->inst_name);
 
-        msgflow->runing_state = RUNING;
+        msgflow->runing_state = RUNNING;
         PT_LOG(PTLOG_INFO, "msgflow execute, msgflow_name = %s.", msgflow->msgflow_name);
         break;
     }
@@ -357,8 +357,8 @@ void pt_task_pause(pt_uc_msgflow_id_t msgflow_id)
         if (msgflow_id != msgflow)
             continue;
 
-        if (msgflow->runing_state != RUNING) {
-            PT_LOG(PTLOG_ERROR, "msgflow is not in RUNING, runing_state = %d.", 
+        if (msgflow->runing_state != RUNNING) {
+            PT_LOG(PTLOG_ERROR, "msgflow is not in RUNNING, runing_state = %d.", 
                 msgflow->runing_state);
             break;
         }
@@ -387,7 +387,7 @@ void pt_task_continue(pt_uc_msgflow_id_t msgflow_id)
             break;
         }
         
-        msgflow->runing_state = RUNING;
+        msgflow->runing_state = RUNNING;
         break;
     }
 
@@ -405,8 +405,8 @@ void pt_task_update(pt_uc_msgflow_id_t msgflow_id, pt_uint64_t count, pt_uint64_
         if (msgflow_id != msgflow)
             continue;
 
-        if (msgflow->runing_state != RUNING) {
-            PT_LOG(PTLOG_ERROR, "msgflow is not in RUNING, runing_state = %d.", 
+        if (msgflow->runing_state != RUNNING) {
+            PT_LOG(PTLOG_ERROR, "msgflow is not in RUNNING, runing_state = %d.", 
                 msgflow->runing_state);
             break;
         }

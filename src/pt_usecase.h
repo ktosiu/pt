@@ -7,7 +7,7 @@ typedef void* pt_uc_msg_id_t;
 
 typedef enum {
     STOP,
-    RUNING,
+    RUNNING,
     PAUSE,
 }pt_uc_runing_sate_e;
 
