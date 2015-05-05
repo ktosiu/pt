@@ -1,5 +1,4 @@
 #include "pt_include.h"
-#include "pt_diam.h"
 
 pt_int32_t pt_diam_encode_octs(pt_uint8_t *octs, pt_uint8_t len, void *buf, pt_int32_t pos)
 {

@@ -1,5 +1,4 @@
 #include "pt_include.h"
-#include "pt_sccp.h"
 
 /*lint -e732 -e774*/
 

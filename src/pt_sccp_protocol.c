@@ -281,13 +281,13 @@ void pt_sccp_recv_msg(m3ua_asp_t *m3ua_asp, pt_uint8_t *in, pt_int32_t len)
     }
 
     sccp_msg_type = *(m3ua_data_msg.protocol_data.data);
-    if (sccp_msg_type) {
+    if (sccp_msg_type == 0x09) {
         if (sccp_msg.udt.tag == 1)
             pt_sccp_scmg_ind(m3ua_asp, &sccp_msg.udt);
         else
             pt_sccp_udt_ind(m3ua_asp, &sccp_msg.udt);
     }
-    else if (sccp_msg_type) {
+    else if (sccp_msg_type == 0x11) {
         pt_sccp_xudt_ind(m3ua_asp, &sccp_msg.xudt);
     }
 }
@@ -363,13 +363,14 @@ pt_int32_t pt_sccp_invoke_xudt(m3ua_asp_t *m3ua_asp, sccp_up_msg_t *up_msg)
     xudt_req.tag_segment = 1;
     xudt_req.segment.sequence_option = 1;
     xudt_req.segment.first_ind = 1;
-    xudt_req.segment.remain_segment = (ltmp / SCCP_XUDT_LEN + (ltmp % SCCP_XUDT_LEN ? 1 : 0));
+    xudt_req.segment.remain_segment = 
+                (pt_uint8_t)(ltmp / SCCP_XUDT_LEN + (ltmp % SCCP_XUDT_LEN ? 1 : 0));
     memcpy(xudt_req.segment.reference, pt_sccp_xudt_reference(), 3);
 
     do
     {
         xudt_req.segment.remain_segment -= 1;
-        xudt_req.len_ud = ltmp > SCCP_XUDT_LEN ? SCCP_XUDT_LEN : ltmp;
+        xudt_req.len_ud = (pt_uint8_t)(ltmp > SCCP_XUDT_LEN ? SCCP_XUDT_LEN : ltmp);
         memcpy(xudt_req.data.ud, ptmp, xudt_req.len_ud);
         if (-1 == pt_sccp_encode(m3ua_asp, 
                             &xudt_req, 

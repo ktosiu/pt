@@ -1,4 +1,7 @@
 #include "pt_include.h"
+
+/*lint -e732 -e734 -e679*/
+
 static sccp_up_msg_t _recv_sccp_up_msg;
 static sccp_up_msg_t _send_sccp_up_msg;
 static gtcap_msg_t _recv_gtcap_msg;
@@ -42,9 +45,9 @@ void pt_task_update_ss7_bytes_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_match
     pt_str2bytes(str_result, (pt_int32_t)strlen(str_result), (pt_uint8_t *)uid, &uid_len);
 
     if (uid_len < l)
-        memcpy(msg->msg_data + pos + l - uid_len, uid, uid_len);
+        memcpy(msg->msg_data + pos + l - uid_len, uid, (pt_uint32_t)uid_len);
     else
-        memcpy(msg->msg_data + pos, &uid[uid_len - l], uid_len);
+        memcpy(msg->msg_data + pos, &uid[uid_len - l], (pt_uint32_t)uid_len);
 }
 
 void pt_task_update_ss7_bcd_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_matchinfo_t *ss7_uid)
@@ -79,9 +82,9 @@ void pt_task_update_ss7_bcd_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_matchin
     pt_str2bcds(str_result, (pt_int32_t)strlen(str_result), (pt_uint8_t *)uid, &uid_len);
 
     if (uid_len < l)
-        memcpy(msg->msg_data + pos + l - uid_len, uid, uid_len);
+        memcpy(msg->msg_data + pos + l - uid_len, uid, (pt_uint32_t)uid_len);
     else
-        memcpy(msg->msg_data + pos, &uid[uid_len - l], uid_len);
+        memcpy(msg->msg_data + pos, &uid[uid_len - l], (pt_uint32_t)uid_len);
 }
 
 void pt_task_update_ss7_uid_with_seq(pt_uc_msg_t *msg, pt_uint64_t seq)
@@ -133,7 +136,7 @@ void pt_task_set_ss7_tran_id(pt_task_pdb_t *pdb, gtcap_tran_id_t *tran_id)
     hword = (pt_uint16_t)pdb->_index;
     lword = (pt_uint16_t)pdb->_sn;
 
-    id = (hword << 16) | lword;
+    id = ((pt_uint32_t)hword << 16) | lword;
 
     tran_id->len = 4;
     memcpy(tran_id->id, &id, 4);
@@ -183,7 +186,7 @@ pt_task_pdb_t *pt_task_locate_ss7_pdb(gtcap_msg_t *gtcap_msg)
 pt_task_ss7_invokeinfo_t *
 pt_task_ss7_local_invokeinfo_locate(pt_task_pdb_t *pdb, pt_uint8_t invokeid)
 {
-    pt_int32_t i;
+    pt_uint32_t i;
 
     for (i = 0; i < pdb->ss7_local_invokeinfo_num; i++) {
          if(pdb->ss7_local_invokeinfo[i].ss7_invokeid == invokeid)
@@ -196,7 +199,7 @@ pt_task_ss7_local_invokeinfo_locate(pt_task_pdb_t *pdb, pt_uint8_t invokeid)
 pt_task_ss7_invokeinfo_t *
 pt_task_ss7_local_invokeinfo_locate_by_opcode(pt_task_pdb_t *pdb, pt_uint8_t opcode)
 {
-    pt_int32_t i;
+    pt_uint32_t i;
 
     for (i = 0; i < pdb->ss7_local_invokeinfo_num; i++) {
          if(pdb->ss7_local_invokeinfo[i].ss7_opcode == opcode)
@@ -225,7 +228,7 @@ pt_task_ss7_local_invokeinfo_alloc(pt_task_pdb_t *pdb, pt_uint8_t opcode)
 pt_task_ss7_invokeinfo_t *
 pt_task_ss7_peer_invokeinfo_locate(pt_task_pdb_t *pdb, pt_uint8_t invokeid)
 {
-    pt_int32_t i;
+    pt_uint32_t i;
 
     for (i = 0; i < pdb->ss7_peer_invokeinfo_num; i++) {
          if(pdb->ss7_peer_invokeinfo[i].ss7_invokeid == invokeid)
@@ -238,7 +241,7 @@ pt_task_ss7_peer_invokeinfo_locate(pt_task_pdb_t *pdb, pt_uint8_t invokeid)
 pt_task_ss7_invokeinfo_t *
 pt_task_ss7_peer_invokeinfo_locate_by_opcode(pt_task_pdb_t *pdb, pt_uint8_t opcode)
 {
-    pt_int32_t i;
+    pt_uint32_t i;
 
     for (i = 0; i < pdb->ss7_peer_invokeinfo_num; i++) {
          if(pdb->ss7_peer_invokeinfo[i].ss7_opcode == opcode)

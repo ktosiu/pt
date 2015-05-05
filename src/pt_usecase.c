@@ -172,8 +172,8 @@ void pt_uc_set_msg_param_ss7(pt_uc_msg_id_t msg_id,
     msg->msg_ss7_opcode = opcode;
     msg->msg_ss7_cda_ssn = cda_ssn;
     msg->msg_ss7_cga_ssn = cga_ssn;
-    pt_str2bcds(cda_code, strlen(cda_code), msg->msg_ss7_cda_code, NULL);
-    pt_str2bcds(cga_code, strlen(cga_code), msg->msg_ss7_cga_code, NULL);
+    pt_str2bcds(cda_code, (pt_int32_t)strlen(cda_code), msg->msg_ss7_cda_code, NULL);
+    pt_str2bcds(cga_code, (pt_int32_t)strlen(cga_code), msg->msg_ss7_cga_code, NULL);
 }
 
 void pt_uc_add_matchinfo(list_head_t *plist, 

@@ -24,7 +24,7 @@ void pt_task_update_diam_sid_with_seq(pt_uc_msg_t *msg,
     pt_char_t strbuf[256];
     pt_char_t *pctmp;
 
-    strncpy(strbuf, sid, sid_len);
+    strncpy(strbuf, sid, (pt_uint32_t)sid_len);
     strbuf_len = sid_len;
 
     /*É¾³ý¶àÓà\0*/
@@ -34,7 +34,7 @@ void pt_task_update_diam_sid_with_seq(pt_uc_msg_t *msg,
 
     pctmp = strstr(strbuf, ";pid");
     if (pctmp != NULL)  
-        strbuf_len = pctmp - strbuf;
+        strbuf_len = (pt_int32_t)(pctmp - strbuf);
      
     strbuf_len += sprintf(&strbuf[strbuf_len], ";pid%ld;%08ld", self_pid, seq);
     pt_task_update_diam_sid(msg, strbuf, strbuf_len);

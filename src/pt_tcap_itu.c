@@ -1,5 +1,7 @@
 #include "pt_include.h"
 
+/*lint -e732 -e734*/
+
 static pt_bool_t g_sup_indef = PT_FALSE;
 
 static pt_int32_t pt_gtcap_encode_invoke_comp(gtcap_comp_t *comp, void *buf, pt_int32_t pos)
@@ -1413,7 +1415,7 @@ static const _GTCAP_ENCODE_FUNC _gtcap_encode_func[] =
 
 pt_int32_t pt_gtcap_encode(gtcap_msg_t *gtcap_msg, void *out, pt_int32_t *len)
 {
-    pt_int32_t i;
+    pt_uint32_t i;
 
     for (i = 0; i < PT_ARRAY_SIZE(_gtcap_code_mapping); i++)
         if (_gtcap_code_mapping[i] == gtcap_msg->m_type)
@@ -1433,7 +1435,7 @@ static const _GTCAP_DECODE_FUNC _gtcap_decode_func[] =
 
 pt_int32_t pt_gtcap_decode(void *in, pt_int32_t len, gtcap_msg_t *gtcap_msg)
 {
-    pt_int32_t i;
+    pt_uint32_t i;
 
     gtcap_msg->m_type = *(pt_uint8_t *)in;
 
@@ -1552,54 +1554,54 @@ pt_int32_t pt_gmap_encode_addr(map_addr_t *addr, void *buf, pt_int32_t pos)
     return pos;
 }
 
-pt_int32_t pt_gmap_encode_dpdu_open(map_dpdu_open_t *open, gtcap_user_info_t *user_info, pt_int32_t pos)
+pt_int32_t pt_gmap_encode_dpdu_open(map_dpdu_open_t *dpdu_open, gtcap_user_info_t *user_info, pt_int32_t pos)
 {
     pt_int32_t tmp;
     
-    if (open->ais_info_flg && open->ais_info.vlrnum_flg)
+    if (dpdu_open->ais_info_flg && dpdu_open->ais_info.vlrnum_flg)
     {
         tmp = pos;
         
-        pos = pt_gmap_encode_addr(&open->ais_info.vlrnum, user_info->info, pos);
+        pos = pt_gmap_encode_addr(&dpdu_open->ais_info.vlrnum, user_info->info, pos);
         CHECK_RESULT(pos);
         
         pos = pt_asn1_encode_tl(0x83, (pt_uint16_t)(tmp-pos), user_info->info, pos);
         CHECK_RESULT(pos);
     }
 
-    if (open->ais_info_flg && open->ais_info.msisdn_flg)
+    if (dpdu_open->ais_info_flg && dpdu_open->ais_info.msisdn_flg)
     {
         tmp = pos;
         
-        pos = pt_gmap_encode_addr(&open->ais_info.msisdn, user_info->info, pos);
+        pos = pt_gmap_encode_addr(&dpdu_open->ais_info.msisdn, user_info->info, pos);
         CHECK_RESULT(pos);
         
         pos = pt_asn1_encode_tl(0x82, (pt_uint16_t)(tmp-pos), user_info->info, pos);
         CHECK_RESULT(pos);
     }
     
-    if (open->orig_ref_flg)
+    if (dpdu_open->orig_ref_flg)
     {
         tmp = pos;
         
-        pos = pt_gmap_encode_addr(&open->orig_ref, user_info->info, pos);
+        pos = pt_gmap_encode_addr(&dpdu_open->orig_ref, user_info->info, pos);
         CHECK_RESULT(pos);
 
         pos = pt_asn1_encode_tl(0x81, (pt_uint16_t)(tmp-pos), user_info->info, pos);
         CHECK_RESULT(pos);
     }
 
-    if (open->dest_ref_flg)
+    if (dpdu_open->dest_ref_flg)
     {
         tmp = pos;
         
-        if (open->ais_imsi_flg)
+        if (dpdu_open->ais_imsi_flg)
         {
-            pos = pt_gmap_encode_addr_num(&open->dest_ref, user_info->info, pos);
+            pos = pt_gmap_encode_addr_num(&dpdu_open->dest_ref, user_info->info, pos);
         }
         else
         {
-            pos = pt_gmap_encode_addr(&open->dest_ref, user_info->info, pos);
+            pos = pt_gmap_encode_addr(&dpdu_open->dest_ref, user_info->info, pos);
         }
         CHECK_RESULT(pos);
         
@@ -1731,30 +1733,28 @@ pt_int32_t pt_gmap_decode_addr(void *buf, pt_int32_t pos, pt_int32_t len, map_ad
     return pos;
 }
 
-pt_int32_t pt_gmap_decode_dpdu_open(gtcap_user_info_t *user_info, pt_int32_t pos, void *dpdu_open)
+pt_int32_t pt_gmap_decode_dpdu_open(gtcap_user_info_t *user_info, pt_int32_t pos, map_dpdu_open_t *dpdu_open)
 {
     pt_uint32_t t;
     pt_int32_t l;
-    
-    map_dpdu_open_t *open = (map_dpdu_open_t *)dpdu_open;
 
     if (pos<user_info->info_len && 0x80 == pt_asn1_code_tag(user_info->info + pos))
     {
         pos = pt_asn1_decode_tl(user_info->info, pos, &t, &l);
         CHECK_RESULT(pos);
 
-		if (1)
+		if (1) 
 		{
-        	pos = pt_gmap_decode_addr(user_info->info, pos, l, &open->dest_ref);
+        	pos = pt_gmap_decode_addr(user_info->info, pos, l, &dpdu_open->dest_ref);
 		}
 		else
 		{
-			pos = pt_gmap_decode_addr_num(user_info->info, pos, l, &open->dest_ref);
-			open->ais_imsi_flg = 1;
+			pos = pt_gmap_decode_addr_num(user_info->info, pos, l, &dpdu_open->dest_ref);
+			dpdu_open->ais_imsi_flg = 1;
 		}
         CHECK_RESULT(pos);
         
-        open->dest_ref_flg = 1;
+        dpdu_open->dest_ref_flg = 1;
     }
 
     if (pos<user_info->info_len && 0x81 == pt_asn1_code_tag(user_info->info + pos))
@@ -1762,32 +1762,32 @@ pt_int32_t pt_gmap_decode_dpdu_open(gtcap_user_info_t *user_info, pt_int32_t pos
         pos = pt_asn1_decode_tl(user_info->info, pos, &t, &l);
         CHECK_RESULT(pos);
 
-        pos = pt_gmap_decode_addr(user_info->info, pos, l, &open->orig_ref);
+        pos = pt_gmap_decode_addr(user_info->info, pos, l, &dpdu_open->orig_ref);
         CHECK_RESULT(pos);
 
-        open->orig_ref_flg = 1;
+        dpdu_open->orig_ref_flg = 1;
     }
 	if (pos<user_info->info_len && 0x82 == pt_asn1_code_tag(user_info->info + pos))
 	{
 		pos = pt_asn1_decode_tl(user_info->info, pos, &t, &l);
         CHECK_RESULT(pos);
 		
-        pos = pt_gmap_decode_addr(user_info->info, pos, l, &open->ais_info.msisdn);
+        pos = pt_gmap_decode_addr(user_info->info, pos, l, &dpdu_open->ais_info.msisdn);
         CHECK_RESULT(pos);
 		
-		open->ais_info.msisdn_flg = 1;
-		open->ais_info_flg = 1;
+		dpdu_open->ais_info.msisdn_flg = 1;
+		dpdu_open->ais_info_flg = 1;
 	}
 	if (pos<user_info->info_len && 0x83 == pt_asn1_code_tag(user_info->info + pos))
 	{
 		pos = pt_asn1_decode_tl(user_info->info, pos, &t, &l);
         CHECK_RESULT(pos);
 		
-        pos = pt_gmap_decode_addr(user_info->info, pos, l, &open->ais_info.vlrnum);
+        pos = pt_gmap_decode_addr(user_info->info, pos, l, &dpdu_open->ais_info.vlrnum);
         CHECK_RESULT(pos);
 		
-		open->ais_info.vlrnum_flg = 1;
-		open->ais_info_flg = 1;
+		dpdu_open->ais_info.vlrnum_flg = 1;
+		dpdu_open->ais_info_flg = 1;
     }
 
     return pos;

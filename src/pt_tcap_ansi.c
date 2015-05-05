@@ -1,5 +1,7 @@
 #include "pt_include.h"
 
+/*lint -e732 -e734*/
+
 static pt_int32_t pt_ctcap_encode_invoke_comp(ctcap_comp_t *comp, void *buf, pt_int32_t pos)
 {
     pt_int32_t tmp = pos;
@@ -106,7 +108,7 @@ static pt_int32_t pt_ctcap_encode_tran_id(ctcap_tran_id_t *orig_id, ctcap_tran_i
         pos = pt_asn1_encode_v(sizeof(ctcap_tran_id_t), dest_id, buf, pos);
         CHECK_RESULT(pos);
 
-        l += sizeof(ctcap_tran_id_t);
+        l += (pt_int32_t)sizeof(ctcap_tran_id_t);
     }
     
     if (orig_id!=NULL)
@@ -114,7 +116,7 @@ static pt_int32_t pt_ctcap_encode_tran_id(ctcap_tran_id_t *orig_id, ctcap_tran_i
         pos = pt_asn1_encode_v(sizeof(ctcap_tran_id_t), orig_id, buf, pos);
         CHECK_RESULT(pos);
 
-        l += sizeof(ctcap_tran_id_t);
+        l += (pt_int32_t)sizeof(ctcap_tran_id_t);
     }
     
     pos = pt_asn1_encode_tl(0xc7, l, buf, pos);

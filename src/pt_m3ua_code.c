@@ -1,5 +1,4 @@
 #include "pt_include.h"
-#include "pt_m3ua.h"
 
 /*lint -e734 -e732 -e578*/
 
@@ -30,7 +29,7 @@ static pt_int32_t pt_m3ua_encode_uchar_array(pt_uint8_t *data, pt_int32_t len, v
 
     /*rfc4666 3.2*/
     if (pos & 0x3) {
-        *(pt_uint32_t*)(buf + pos) = 0;
+        *(pt_uint32_t*)((pt_uint8_t *)buf + pos) = 0;
         pos = (pos + 3) & (~3);
     }
 
