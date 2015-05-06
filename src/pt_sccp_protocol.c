@@ -16,9 +16,7 @@ void pt_sccp_xudt_buf_init(void)
     pt_uint16_t i;
 
     for (i = 0; i < MAX_XUDT_BUF; i++)
-    {
         list_add_tail(&_xudt_buf[i].node, &list_xudt_buf_free);
-    }
 }
 
 xudt_buf_t *pt_sccp_xudt_buf_alloc(sccp_ref_t sccp_ref)
@@ -79,7 +77,7 @@ void pt_sccp_ageing_xudt_buf()
 pt_uint8_t pt_sccp_get_sls(void)
 {
 	static pt_uint8_t sls = 0;
-	
+
 	return (sls++ % 15) + 1;
 }
 
@@ -91,11 +89,11 @@ void pt_sccp_make_address(pt_uint8_t gtcode[11], pt_uint8_t ssn, sccp_address_t 
     gt->tag_route = 0;
     gt->spare = 0;
     gt->ssn = ssn;
-    gt->gt.gt4.trans_type = 0; 
+    gt->gt.gt4.trans_type = 0;
     if (pt_bcdlen(gtcode) & 1)
-        gt->gt.gt4.code_design = 1; 
-    else 
-        gt->gt.gt4.code_design = 2; 
+        gt->gt.gt4.code_design = 1;
+    else
+        gt->gt.gt4.code_design = 2;
     gt->gt.gt4.code_plan = 1;
     gt->gt.gt4.tag_addr = 4;
     gt->gt.gt4.free = 0;
@@ -142,9 +140,9 @@ void pt_sccp_scmg_sst(m3ua_asp_t *m3ua_asp, sccp_udt_t *udt_ind)
     udt_req.data.scmg.smi = 0;
     memcpy(udt_req.data.scmg.dpc, udt_ind->data.scmg.dpc, 3);
 
-    if (-1 == pt_sccp_encode(m3ua_asp, 
+    if (-1 == pt_sccp_encode(m3ua_asp,
                          &udt_req,
-                         m3ua_data_msg.protocol_data.data, 
+                         m3ua_data_msg.protocol_data.data,
                          &m3ua_data_msg.protocol_data.num)) {
         PT_LOG(PTLOG_ERROR, "sccp encode failed!");
         return;
@@ -211,8 +209,8 @@ void pt_sccp_xudt_ind(m3ua_asp_t *m3ua_asp, sccp_xudt_t *xudt_ind)
     sccp_up_msg_t up_msg;
 
     /*
-    if (0 == xudt_ind->tag_segment 
-        || 1 == xudt_ind->segment.first_ind 
+    if (0 == xudt_ind->tag_segment
+        || 1 == xudt_ind->segment.first_ind
         && 0 == xudt_ind->segment.remain_segment)
     {
         return;
@@ -221,11 +219,11 @@ void pt_sccp_xudt_ind(m3ua_asp_t *m3ua_asp, sccp_xudt_t *xudt_ind)
 
     if (xudt_ind->segment.first_ind == 1)
         xudt_buf = pt_sccp_xudt_buf_alloc(xudt_ind->segment.reference);
-    else 
+    else
         xudt_buf = pt_sccp_xudt_buf_locate(xudt_ind->segment.reference);
 
     if (xudt_buf == NULL) {
-        PT_LOG(PTLOG_ERROR, "get xudt_buf failed first_ind = %d!", 
+        PT_LOG(PTLOG_ERROR, "get xudt_buf failed first_ind = %d!",
                 xudt_ind->segment.first_ind);
         return;
     }
@@ -257,7 +255,7 @@ void pt_sccp_recv_msg(m3ua_asp_t *m3ua_asp, pt_uint8_t *in, pt_int32_t len)
     sccp_msg_u sccp_msg;
     pt_uint8_t sccp_msg_type;
 
-    PT_LOG(PTLOG_DEBUG, "recv msg from m3ua, %s-%s", 
+    PT_LOG(PTLOG_DEBUG, "recv msg from m3ua, %s-%s",
             pt_addr_a(&m3ua_asp->conn_item.local_addr[0]),
             pt_addr_a(&m3ua_asp->conn_item.remote_addr[0]));
 
@@ -267,14 +265,14 @@ void pt_sccp_recv_msg(m3ua_asp_t *m3ua_asp, pt_uint8_t *in, pt_int32_t len)
     }
 
     if (m3ua_data_msg.protocol_data.si != 3) {
-        PT_LOG(PTLOG_ERROR, "invalid m3ua protocol data si = %d!", 
+        PT_LOG(PTLOG_ERROR, "invalid m3ua protocol data si = %d!",
                 m3ua_data_msg.protocol_data.si);
         return;
     }
 
-    if (-1 == pt_sccp_decode(m3ua_asp, 
-                        m3ua_data_msg.protocol_data.data, 
-                        m3ua_data_msg.protocol_data.num, 
+    if (-1 == pt_sccp_decode(m3ua_asp,
+                        m3ua_data_msg.protocol_data.data,
+                        m3ua_data_msg.protocol_data.num,
                         &sccp_msg)) {
         PT_LOG(PTLOG_ERROR, "sccp decode failed!");
         return;
@@ -286,8 +284,7 @@ void pt_sccp_recv_msg(m3ua_asp_t *m3ua_asp, pt_uint8_t *in, pt_int32_t len)
             pt_sccp_scmg_ind(m3ua_asp, &sccp_msg.udt);
         else
             pt_sccp_udt_ind(m3ua_asp, &sccp_msg.udt);
-    }
-    else if (sccp_msg_type == 0x11) {
+    } else if (sccp_msg_type == 0x11) {
         pt_sccp_xudt_ind(m3ua_asp, &sccp_msg.xudt);
     }
 }
@@ -296,7 +293,7 @@ pt_int32_t pt_sccp_invoke_udt(m3ua_asp_t *m3ua_asp, sccp_up_msg_t *up_msg)
 {
     sccp_udt_t  udt_req;
     m3ua_payload_data_t m3ua_data_msg;
-    
+
     /*TODO set sccp parameter*/
     udt_req.msg_type = SCCP_MSG_UDT;
     udt_req.return_opt = 8;
@@ -309,9 +306,9 @@ pt_int32_t pt_sccp_invoke_udt(m3ua_asp_t *m3ua_asp, sccp_up_msg_t *up_msg)
     udt_req.len_ud = (pt_uint8_t)up_msg->data_len;
     memcpy(udt_req.data.ud, up_msg->pdata, udt_req.len_ud);
 
-    if (-1 == pt_sccp_encode(m3ua_asp, 
+    if (-1 == pt_sccp_encode(m3ua_asp,
                          &udt_req,
-                         m3ua_data_msg.protocol_data.data, 
+                         m3ua_data_msg.protocol_data.data,
                          &m3ua_data_msg.protocol_data.num)) {
         PT_LOG(PTLOG_ERROR, "sccp encode failed!");
         return -1;
@@ -363,7 +360,7 @@ pt_int32_t pt_sccp_invoke_xudt(m3ua_asp_t *m3ua_asp, sccp_up_msg_t *up_msg)
     xudt_req.tag_segment = 1;
     xudt_req.segment.sequence_option = 1;
     xudt_req.segment.first_ind = 1;
-    xudt_req.segment.remain_segment = 
+    xudt_req.segment.remain_segment =
                 (pt_uint8_t)(ltmp / SCCP_XUDT_LEN + (ltmp % SCCP_XUDT_LEN ? 1 : 0));
     memcpy(xudt_req.segment.reference, pt_sccp_xudt_reference(), 3);
 
@@ -372,9 +369,9 @@ pt_int32_t pt_sccp_invoke_xudt(m3ua_asp_t *m3ua_asp, sccp_up_msg_t *up_msg)
         xudt_req.segment.remain_segment -= 1;
         xudt_req.len_ud = (pt_uint8_t)(ltmp > SCCP_XUDT_LEN ? SCCP_XUDT_LEN : ltmp);
         memcpy(xudt_req.data.ud, ptmp, xudt_req.len_ud);
-        if (-1 == pt_sccp_encode(m3ua_asp, 
-                            &xudt_req, 
-                            m3ua_data_msg.protocol_data.data, 
+        if (-1 == pt_sccp_encode(m3ua_asp,
+                            &xudt_req,
+                            m3ua_data_msg.protocol_data.data,
                             &m3ua_data_msg.protocol_data.num)) {
             PT_LOG(PTLOG_ERROR, "sccp encode failed!");
             return -1;
@@ -387,7 +384,7 @@ pt_int32_t pt_sccp_invoke_xudt(m3ua_asp_t *m3ua_asp, sccp_up_msg_t *up_msg)
         if (-1 == pt_m3ua_encode(M3UA_TRAN_DATA, &m3ua_data_msg, _sccp_buf, &_sccp_buf_len)) {
             return -1;
         }
-        
+
         if (pt_m3ua_send_data_to_conn(m3ua_asp, _sccp_buf, _sccp_buf_len) < 0)
             return -1;
 
@@ -401,18 +398,14 @@ pt_int32_t pt_sccp_invoke_xudt(m3ua_asp_t *m3ua_asp, sccp_up_msg_t *up_msg)
 
 pt_int32_t pt_sccp_send_data_to_m3ua(m3ua_asp_t *m3ua_asp, sccp_up_msg_t *up_msg)
 {
-    PT_LOG(PTLOG_DEBUG, "send msg to m3ua, %s-%s", 
+    PT_LOG(PTLOG_DEBUG, "send msg to m3ua, %s-%s",
             pt_addr_a(&m3ua_asp->conn_item.local_addr[0]),
             pt_addr_a(&m3ua_asp->conn_item.remote_addr[0]));
 
     if (up_msg->data_len > SCCP_XUDT_LEN)
-    {
         return pt_sccp_invoke_xudt(m3ua_asp, up_msg);
-    }
     else
-    {
         return pt_sccp_invoke_udt(m3ua_asp, up_msg);
-    }
 }
 
 void *pt_sccp_thread(void *arg)

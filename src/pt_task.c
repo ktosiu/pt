@@ -7,12 +7,12 @@ LIST_HEAD(list_pdb_used);
 
 #define _MAX_PDB  10000
 
-void pt_task_int_pdb() 
+void pt_task_int_pdb()
 {
     pt_uint32_t i;
-    
+
     pdb_res = pt_malloc(_MAX_PDB * sizeof(pt_task_pdb_t));
-    
+
     for (i = 0; i < _MAX_PDB; i++)
         list_add_tail(&pdb_res[i].node, &list_pdb_free);
 }
@@ -178,7 +178,7 @@ void *pt_task_send_thread(void *arg)
     pt_uc_msg_t *msg;
     st_utime_t last_time;
     st_utime_t accumulate_time;
-    pt_uint64_t erratum;        
+    pt_uint64_t erratum;
 
     msg = (pt_uc_msg_t *)arg;
     msgflow = msg->inst->msgflow;
@@ -211,14 +211,14 @@ void *pt_task_send_thread(void *arg)
 
             if (msgflow->runing_state == STOP)
                 break;
-            
+
             if (i == (_INTERVAL - 1))
                 interval_count += interval_cover;
 
             for (j = 0; j < interval_count && msgflow->execute_times < msgflow->times; j++) {
                 if (pt_task_send_msg(msg, msgflow->execute_count) < 0)
                     break;
-                
+
                 msgflow->execute_count++;
 
                 if (msgflow->execute_count == msgflow->count) {
@@ -237,7 +237,7 @@ void *pt_task_send_thread(void *arg)
         last_time = st_utime();
         accumulate_time += 1000000;
 
-        if (msgflow->runing_state == STOP) 
+        if (msgflow->runing_state == STOP)
             break;
     }
 
@@ -269,7 +269,7 @@ void *pt_task_thread(void *arg)
     return NULL;
 }
 
-void pt_task_start(pt_uc_msgflow_id_t msgflow_id, pt_uint64_t count, pt_uint64_t rate, 
+void pt_task_start(pt_uc_msgflow_id_t msgflow_id, pt_uint64_t count, pt_uint64_t rate,
             pt_uint64_t times, pt_uint32_t delay)
 {
     list_head_t *pos;
@@ -283,7 +283,7 @@ void pt_task_start(pt_uc_msgflow_id_t msgflow_id, pt_uint64_t count, pt_uint64_t
             continue;
 
         if (msgflow->runing_state == RUNNING || msgflow->runing_state == PAUSE) {
-            PT_LOG(PTLOG_ERROR, "already in executing, runing_state = %d, sgflow_name = %s.", 
+            PT_LOG(PTLOG_ERROR, "already in executing, runing_state = %d, sgflow_name = %s.",
                 msgflow->runing_state, msgflow->msgflow_name);
             break;
         }
@@ -292,13 +292,13 @@ void pt_task_start(pt_uc_msgflow_id_t msgflow_id, pt_uint64_t count, pt_uint64_t
             PT_LOG(PTLOG_ERROR, "empty inst list, msgflow_name = %s", msgflow->msgflow_name);
             break;
         }
-        
+
         inst = list_entry(msgflow->list_inst.next, pt_uc_inst_t, node);
         if (list_empty(&inst->list_msg)) {
             PT_LOG(PTLOG_ERROR, "empty msg list, inst_name = %s.", inst->inst_name);
             break;
         }
-        
+
         msg = list_entry(inst->list_msg.next, pt_uc_msg_t, node);
         if (msg->msg_action != MSG_ACTION_SEND) {
             PT_LOG(PTLOG_ERROR, "is recv msg, msgname = %s.", msg->msg_name);
@@ -321,7 +321,7 @@ void pt_task_start(pt_uc_msgflow_id_t msgflow_id, pt_uint64_t count, pt_uint64_t
                 msgflow->msgflow_name, inst->inst_name);
 
         msgflow->runing_state = RUNNING;
-        PT_LOG(PTLOG_INFO, "msgflow execute, msgflow_name = %s.", msgflow->msgflow_name);
+        PT_LOG(PTLOG_INFO, "msgflow start, msgflow_name = %s.", msgflow->msgflow_name);
         break;
     }
 
@@ -339,6 +339,7 @@ void pt_task_stop(pt_uc_msgflow_id_t msgflow_id)
         if (msgflow_id != msgflow)
             continue;
         msgflow->runing_state = STOP;
+        PT_LOG(PTLOG_INFO, "msgflow stop, msgflow_name = %s.", msgflow->msgflow_name);
         break;
     }
 
@@ -358,11 +359,12 @@ void pt_task_pause(pt_uc_msgflow_id_t msgflow_id)
             continue;
 
         if (msgflow->runing_state != RUNNING) {
-            PT_LOG(PTLOG_ERROR, "msgflow is not in RUNNING, runing_state = %d.", 
+            PT_LOG(PTLOG_ERROR, "msgflow is not in RUNNING, runing_state = %d.",
                 msgflow->runing_state);
             break;
         }
-        
+
+        PT_LOG(PTLOG_INFO, "msgflow pause, msgflow_name = %s.", msgflow->msgflow_name);
         msgflow->runing_state = PAUSE;
         break;
     }
@@ -382,11 +384,12 @@ void pt_task_continue(pt_uc_msgflow_id_t msgflow_id)
             continue;
 
         if (msgflow->runing_state != PAUSE) {
-            PT_LOG(PTLOG_ERROR, "msgflow is not in PAUSE, runing_state = %d.", 
+            PT_LOG(PTLOG_ERROR, "msgflow is not in PAUSE, runing_state = %d.",
                 msgflow->runing_state);
             break;
         }
-        
+
+        PT_LOG(PTLOG_INFO, "msgflow continue, msgflow_name = %s.", msgflow->msgflow_name);
         msgflow->runing_state = RUNNING;
         break;
     }
@@ -406,13 +409,14 @@ void pt_task_update(pt_uc_msgflow_id_t msgflow_id, pt_uint64_t count, pt_uint64_
             continue;
 
         if (msgflow->runing_state != RUNNING) {
-            PT_LOG(PTLOG_ERROR, "msgflow is not in RUNNING, runing_state = %d.", 
+            PT_LOG(PTLOG_ERROR, "msgflow is not in RUNNING, runing_state = %d.",
                 msgflow->runing_state);
             break;
         }
         msgflow->rate  = rate;
         msgflow->count = count;
         msgflow->times = times;
+        PT_LOG(PTLOG_INFO, "msgflow update, msgflow_name = %s.", msgflow->msgflow_name);
         break;
     }
 
