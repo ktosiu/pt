@@ -262,8 +262,7 @@ void pt_sctp_close(pt_conn_tcb_t *tcb)
         pt_addr_a(&tcb->instance->local_addr[0]), 
         pt_addr_a(&tcb->remote_addr[0]),
         tcb->instance->service);
-    if (tcb->instance->service == PT_SERVICE_CLI)
-    {
+    if (tcb->instance->service == PT_SERVICE_CLI) {
         tcb->instance->st_nfd = NULL;
     }
     tcb->sk_status = PT_STATUS_CLOSE;
