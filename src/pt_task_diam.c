@@ -17,7 +17,7 @@ void pt_task_update_diam_sid(pt_uc_msg_t *msg, pt_char_t *sid, pt_int32_t sid_le
 }
 
 /*根据用例中的sid和seq生成SID*/
-void pt_task_update_diam_sid_with_seq(pt_uc_msg_t *msg, 
+void pt_task_update_diam_sid_with_seq(pt_uc_msg_t *msg,
                             pt_char_t *sid, pt_int32_t sid_len, pt_uint64_t seq)
 {
     pt_int32_t strbuf_len;
@@ -33,9 +33,9 @@ void pt_task_update_diam_sid_with_seq(pt_uc_msg_t *msg,
     strbuf[strbuf_len] = 0;
 
     pctmp = strstr(strbuf, ";pid");
-    if (pctmp != NULL)  
+    if (pctmp != NULL)
         strbuf_len = (pt_int32_t)(pctmp - strbuf);
-     
+
     strbuf_len += sprintf(&strbuf[strbuf_len], ";pid%ld;%08ld", self_pid, seq);
     pt_task_update_diam_sid(msg, strbuf, strbuf_len);
 }
@@ -98,7 +98,7 @@ void pt_task_update_diam_bytes_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_matc
     pt_bytes2str((pt_uint8_t *)diam_uid->data, diam_uid->data_len, str_uid, &str_uid_len);
 
     pt_str_add(str_seq, str_uid, str_result, 16);
-    
+
     uid_len = sizeof(uid);
     pt_str2bytes(str_result, (pt_int32_t)strlen(str_result), (pt_uint8_t *)uid, &uid_len);
 
@@ -114,7 +114,7 @@ void pt_task_update_diam_uid_with_seq(pt_uc_msg_t *msg, pt_uint64_t seq)
 {
     list_head_t *diam_uid_pos;
     pt_uc_matchinfo_t *diam_uid;
-    
+
     list_for_each(diam_uid_pos, &msg->list_msg_uid) {
         diam_uid = list_entry(diam_uid_pos, pt_uc_matchinfo_t, node);
         switch(diam_uid->data_type) {
@@ -151,8 +151,8 @@ void pt_task_update_diam_uid_with_msgdata(pt_uc_msg_t *msg, pt_uint8_t *msg_data
 
         avp_data = pt_diam_get_avp_data(msg_data, pos);
         avp_data_len = pt_diam_get_avp_data_len(msg_data, pos);
-        pt_diam_set_avp_data(msg->msg_data, 
-                &msg->msg_data_len, 
+        pt_diam_set_avp_data(msg->msg_data,
+                &msg->msg_data_len,
                 diam_uid->tag,
                 avp_data,
                 avp_data_len);
@@ -167,13 +167,13 @@ void pt_task_update_diam_replace(pt_uc_msg_t *msg)
 
     if (msg->msg_stat_total > 0)
         return;
-    
+
     list_for_each(diam_replace_pos, &msg->list_msg_replace) {
         diam_replace = list_entry(diam_replace_pos, pt_uc_matchinfo_t, node);
-        pt_diam_set_avp_data(msg->msg_data, 
-                &msg->msg_data_len, 
-                diam_replace->tag, 
-                diam_replace->data, 
+        pt_diam_set_avp_data(msg->msg_data,
+                &msg->msg_data_len,
+                diam_replace->tag,
+                diam_replace->data,
                 diam_replace->data_len);
     }
 }
@@ -186,7 +186,7 @@ pt_bool_t pt_task_match_diam_msg(pt_uc_msg_t *msg, pt_uint8_t *data, pt_int32_t 
 
     if (msg->msg_action != MSG_ACTION_RECEIVE)
         return PT_FALSE;
-    
+
     if (pt_diam_get_cmd_code(data, len) != pt_diam_get_cmd_code(msg->msg_data, msg->msg_data_len))
         return PT_FALSE;
 
@@ -196,14 +196,14 @@ pt_bool_t pt_task_match_diam_msg(pt_uc_msg_t *msg, pt_uint8_t *data, pt_int32_t 
     /*自定义条件*/
     list_for_each(diam_condition_pos, &msg->list_msg_condition) {
         diam_condition = list_entry(diam_condition_pos, pt_uc_matchinfo_t, node);
-        pos = pt_diam_get_avp_pos(data, len, diam_condition->tag, NULL); 
+        pos = pt_diam_get_avp_pos(data, len, diam_condition->tag, NULL);
         if (pos < 0)
             return PT_FALSE;
 
         if (diam_condition->data_len != pt_diam_get_avp_data_len(data, pos))
             return PT_FALSE;
 
-        if (memcmp(diam_condition->data, pt_diam_get_avp_data(data, pos), 
+        if (memcmp(diam_condition->data, pt_diam_get_avp_data(data, pos),
                     (pt_uint32_t)diam_condition->data_len))
             return PT_FALSE;
     }
@@ -217,7 +217,7 @@ pt_uc_msg_t *pt_task_next_diam_send_arg_msg(pt_uc_msg_t *ack_msg)
     pt_uc_inst_t *arg_inst;
     if (!pt_task_last_msg(ack_msg)) {
         arg_msg = list_entry(ack_msg->node.next, pt_uc_msg_t, node);
-        if (arg_msg->msg_action != MSG_ACTION_SEND && 
+        if (arg_msg->msg_action != MSG_ACTION_SEND &&
             pt_diam_get_cmd_flg_R(arg_msg->msg_data, arg_msg->msg_data_len)) {
             return arg_msg;
         }
@@ -227,12 +227,12 @@ pt_uc_msg_t *pt_task_next_diam_send_arg_msg(pt_uc_msg_t *ack_msg)
     while (!pt_task_last_inst(arg_inst)) {
         arg_inst = list_entry(arg_inst->node.next, pt_uc_inst_t, node);
         arg_msg = list_entry(arg_inst->list_msg.next, pt_uc_msg_t, node);
-        if (arg_msg->msg_action == MSG_ACTION_SEND && 
+        if (arg_msg->msg_action == MSG_ACTION_SEND &&
             pt_diam_get_cmd_flg_R(arg_msg->msg_data, arg_msg->msg_data_len)) {
             return arg_msg;
-        }       
+        }
     };
-    
+
     return NULL;
 }
 
@@ -240,7 +240,7 @@ pt_uc_msg_t *pt_task_next_diam_send_ack_msg(pt_uc_msg_t *arg_msg)
 {
     pt_uc_msg_t *ack_msg;
 
-    if (pt_task_last_msg(arg_msg)) 
+    if (pt_task_last_msg(arg_msg))
         return NULL;
 
     ack_msg = list_entry(arg_msg->node.next, pt_uc_msg_t, node);
@@ -250,11 +250,11 @@ pt_uc_msg_t *pt_task_next_diam_send_ack_msg(pt_uc_msg_t *arg_msg)
     if (pt_diam_get_cmd_flg_R(ack_msg->msg_data, ack_msg->msg_data_len))
         return NULL;
 
-    if (pt_diam_get_cmd_appid(ack_msg->msg_data, ack_msg->msg_data_len) != 
+    if (pt_diam_get_cmd_appid(ack_msg->msg_data, ack_msg->msg_data_len) !=
         pt_diam_get_cmd_appid(arg_msg->msg_data, arg_msg->msg_data_len))
         return NULL;
 
-    if (pt_diam_get_cmd_code(ack_msg->msg_data, ack_msg->msg_data_len) != 
+    if (pt_diam_get_cmd_code(ack_msg->msg_data, ack_msg->msg_data_len) !=
         pt_diam_get_cmd_code(arg_msg->msg_data, arg_msg->msg_data_len))
         return NULL;
 
@@ -274,11 +274,11 @@ pt_uc_msg_t *pt_task_next_diam_recv_ack_msg(pt_uc_msg_t *arg_msg)
     if (pt_diam_get_cmd_flg_R(ack_msg->msg_data, ack_msg->msg_data_len))
         return NULL;
 
-    if (pt_diam_get_cmd_appid(ack_msg->msg_data, ack_msg->msg_data_len) != 
+    if (pt_diam_get_cmd_appid(ack_msg->msg_data, ack_msg->msg_data_len) !=
         pt_diam_get_cmd_appid(arg_msg->msg_data, arg_msg->msg_data_len))
         return NULL;
 
-    if (pt_diam_get_cmd_code(ack_msg->msg_data, ack_msg->msg_data_len) != 
+    if (pt_diam_get_cmd_code(ack_msg->msg_data, ack_msg->msg_data_len) !=
         pt_diam_get_cmd_code(arg_msg->msg_data, arg_msg->msg_data_len))
         return NULL;
 
@@ -306,10 +306,10 @@ pt_uc_msg_t *pt_task_this_diam_recv_arg_msg(pt_uint8_t *data, pt_int32_t len)
         }
     }
 
-    return NULL;    
+    return NULL;
 }
 
-pt_int32_t pt_task_get_diam_msg_sid(pt_uint8_t *msg, pt_int32_t msg_len, 
+pt_int32_t pt_task_get_diam_msg_sid(pt_uint8_t *msg, pt_int32_t msg_len,
                             pt_char_t **ppsid, pt_int32_t *psidlen)
 {
     pt_int32_t pos;
@@ -326,8 +326,8 @@ pt_int32_t pt_task_get_diam_msg_sid(pt_uint8_t *msg, pt_int32_t msg_len,
     return 0;
 }
 
-pt_int32_t pt_task_get_diam_ack_msg_returecode(pt_uint8_t *msg, 
-                            pt_int32_t msg_len, pt_uint32_t *preturecode) 
+pt_int32_t pt_task_get_diam_ack_msg_returecode(pt_uint8_t *msg,
+                            pt_int32_t msg_len, pt_uint32_t *preturecode)
 {
     pt_int32_t pos;
     pt_uint8_t *cmd_data;
@@ -352,7 +352,7 @@ pt_int32_t pt_task_get_diam_ack_msg_returecode(pt_uint8_t *msg,
     return 0;
 }
 
-pt_int32_t pt_task_send_diam_ack_msg(pt_uc_msg_t *ack_msg, diam_conn_t *diam_conn, 
+pt_int32_t pt_task_send_diam_ack_msg(pt_uc_msg_t *ack_msg, diam_conn_t *diam_conn,
                             pt_uint8_t *arg_data, pt_int32_t arg_len)
 {
     pt_uint32_t etoe;
@@ -444,14 +444,14 @@ void pt_task_recv_diam_ack_msg(diam_conn_t *diam_conn, pt_uint8_t *data, pt_int3
     pdb_sn = pt_diam_get_cmd_endtoend(data, len);
     pdb = pt_task_locate_pdb(pdb_index, pdb_sn);
     if (pdb == NULL ) {
-        PT_LOG(PTLOG_INFO, "recv invalid msg pdb = %p, pdb_index = %u, pdb_sn = %u!", 
+        PT_LOG(PTLOG_INFO, "recv invalid msg pdb = %p, pdb_index = %u, pdb_sn = %u!",
             pdb, pdb_index, pdb_sn);
         return;
     }
 
     if (!pt_task_match_diam_msg(pdb->msg, data, len))
         PT_LOG(PTLOG_INFO, "match diam msg failed, msg_name = %s.", pdb->msg->msg_name);
-    
+
     ack_msg = pdb->msg;
     ack_msg->msg_stat_total++;
     if (pt_task_get_diam_ack_msg_returecode(data, len, &returecode) == 0 && returecode >= 3000)
@@ -468,7 +468,7 @@ void pt_task_recv_diam_ack_msg(diam_conn_t *diam_conn, pt_uint8_t *data, pt_int3
     }
 
     pt_task_free_pdb(pdb);
-} 
+}
 
 void pt_task_recv_diam_arg_msg(diam_conn_t *diam_conn, pt_uint8_t *data, pt_int32_t len)
 {
@@ -493,7 +493,7 @@ void pt_task_recv_diam_arg_msg(diam_conn_t *diam_conn, pt_uint8_t *data, pt_int3
 
 void pt_task_recv_diam_msg(diam_conn_t *diam_conn, pt_uint8_t *data, pt_int32_t len)
 {
-    PT_LOG(PTLOG_INFO, "recv diam_msg cmdcode = %u, R = %d", 
+    PT_LOG(PTLOG_INFO, "recv diam_msg cmdcode = %u, R = %d",
             pt_diam_get_cmd_code(data, len), pt_diam_get_cmd_flg_R(data, len));
 
     if (pt_diam_get_cmd_flg_R(data, len))

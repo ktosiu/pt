@@ -24,7 +24,7 @@ typedef struct gtcap_tran_id_tag
 typedef struct gtcap_comp_tag
 {
     pt_uint32_t comp_type;
-    
+
     pt_uint8_t invoke_id;
 
     union {
@@ -34,7 +34,7 @@ typedef struct gtcap_comp_tag
 
             pt_uint8_t op_code;
         }invoke;
-        
+
         struct {
             pt_uint8_t op_code_flg;
             pt_uint8_t op_code;
@@ -94,7 +94,7 @@ typedef struct gtcap_dlg_tag
         struct {
             pt_uint8_t ac_version;
             pt_uint8_t ac_value;
-            
+
             pt_uint8_t result;
             pt_uint8_t diagnostic;
         }aare;
@@ -219,7 +219,7 @@ typedef struct map_addr_tag
 	pt_uint8_t    num_plan    :4;
 	pt_uint8_t    nature      :3;
 	pt_uint8_t    ext         :1;
-    
+
 	pt_uint8_t	num;
 	pt_uint8_t	isdn[mAddrStrLen_M];
 }map_addr_t;
@@ -276,7 +276,7 @@ typedef struct map_dpdu_tag
         map_dpdu_uabort_t   uabort;
         pt_uint8_t          pabort;
     }unit;
-    
+
 #define m_open unit.open
 #define m_accept unit.accept
 #define m_close unit.close

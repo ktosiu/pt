@@ -33,7 +33,7 @@ typedef struct pt_uc_msgflow_s {
 
 typedef struct pt_uc_inst_s {
     list_head_t node;
-    
+
     pt_char_t   *inst_name;
 
     list_head_t list_msg;
@@ -120,21 +120,21 @@ pt_uc_msgflow_id_t pt_uc_locate_msgflow(char *msgflow_name);
 
 pt_uc_msgflow_id_t pt_uc_add_msgflow(pt_char_t *msgflow_name, pt_uint32_t delay);
 pt_uc_inst_id_t pt_uc_add_inst(pt_uc_msgflow_id_t msgflow_id, pt_char_t *inst_name);
-pt_uc_msg_id_t pt_uc_add_msg(pt_uc_inst_id_t inst_id, 
-                    pt_char_t *msg_name, pt_int32_t msg_action, pt_int32_t msg_type, 
+pt_uc_msg_id_t pt_uc_add_msg(pt_uc_inst_id_t inst_id,
+                    pt_char_t *msg_name, pt_int32_t msg_action, pt_int32_t msg_type,
                     pt_uint8_t *msg_data, pt_int32_t msg_data_len);
 void pt_uc_set_msg_linkid(pt_uc_msg_id_t msg_id, pt_uint32_t msg_link_id);
-void pt_uc_set_msg_param_ss7(pt_uc_msg_id_t msg_id, 
+void pt_uc_set_msg_param_ss7(pt_uc_msg_id_t msg_id,
                 pt_uint8_t acver, pt_uint8_t acvalue, pt_uint8_t comptype, pt_uint8_t opcode,
                 pt_char_t *cda_code, pt_uint8_t cda_ssn, pt_char_t *cga_code, pt_uint8_t cga_ssn);
-void pt_uc_add_msg_uid(pt_uc_msg_id_t msg_id, 
-                pt_int32_t uid_type, pt_char_t *uid, pt_int32_t uid_len, 
+void pt_uc_add_msg_uid(pt_uc_msg_id_t msg_id,
+                pt_int32_t uid_type, pt_char_t *uid, pt_int32_t uid_len,
                 pt_char_t *strtag);
-void pt_uc_add_msg_replace(pt_uc_msg_id_t msg_id, 
-                pt_int32_t replace_type, pt_char_t *replace, pt_int32_t replace_len, 
+void pt_uc_add_msg_replace(pt_uc_msg_id_t msg_id,
+                pt_int32_t replace_type, pt_char_t *replace, pt_int32_t replace_len,
                 pt_char_t *strtag);
-void pt_uc_add_msg_condition(pt_uc_msg_id_t msg_id, 
-                pt_int32_t condition_type, pt_char_t *condition, pt_int32_t condition_len, 
+void pt_uc_add_msg_condition(pt_uc_msg_id_t msg_id,
+                pt_int32_t condition_type, pt_char_t *condition, pt_int32_t condition_len,
                 pt_char_t *strtag);
 
 #endif /*_PT_USECASE_H_*/

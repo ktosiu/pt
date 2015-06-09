@@ -4,9 +4,9 @@
 
 LIST_HEAD(list_instance);
 
-pt_conn_instance_t *pt_conn_alloc_instance(pt_conn_protocol_e protocol, 
-                                           pt_conn_service_e service, 
-                                           pt_sockaddr_storage_t local_addr[PT_MAX_ADDR_NUM], 
+pt_conn_instance_t *pt_conn_alloc_instance(pt_conn_protocol_e protocol,
+                                           pt_conn_service_e service,
+                                           pt_sockaddr_storage_t local_addr[PT_MAX_ADDR_NUM],
                                            pt_uint32_t local_addr_num)
 {
     pt_conn_instance_t *instance;
@@ -26,7 +26,7 @@ pt_conn_instance_t *pt_conn_alloc_instance(pt_conn_protocol_e protocol,
     instance->addrlen = PT_ADDRLEN_IN;
 
     instance->local_addr_num = local_addr_num;
-    memcpy(instance->local_addr, local_addr, 
+    memcpy(instance->local_addr, local_addr,
         sizeof(pt_sockaddr_storage_t) * local_addr_num);
 
     instance->st_nfd = NULL;
@@ -40,13 +40,13 @@ pt_conn_instance_t *pt_conn_alloc_instance(pt_conn_protocol_e protocol,
 void pt_conn_free_instance(pt_conn_instance_t *instance)
 {
     list_del(&instance->node);
-    
+
     pt_free(instance);
 }
 
-pt_conn_instance_t *pt_conn_locate_instance(pt_conn_protocol_e protocol, 
-                        pt_conn_service_e service, 
-                        pt_sockaddr_storage_t local_addr[PT_MAX_ADDR_NUM], 
+pt_conn_instance_t *pt_conn_locate_instance(pt_conn_protocol_e protocol,
+                        pt_conn_service_e service,
+                        pt_sockaddr_storage_t local_addr[PT_MAX_ADDR_NUM],
                         pt_uint32_t local_addr_num)
 {
     pt_conn_instance_t *instance;
@@ -81,9 +81,9 @@ pt_conn_instance_t *pt_conn_locate_instance(pt_conn_protocol_e protocol,
     return NULL;
 }
 
-pt_conn_tcb_t *pt_conn_alloc_tcb(pt_conn_instance_t *instance, 
+pt_conn_tcb_t *pt_conn_alloc_tcb(pt_conn_instance_t *instance,
                      pt_sockaddr_storage_t *remote_addr,
-                     pt_uint32_t remote_addr_num, 
+                     pt_uint32_t remote_addr_num,
                      pt_uint32_t sctp_ppid,
                      _PT_HANDLE_DATA handle_data_func,
                      void *handle_data_func_arg)
@@ -98,7 +98,7 @@ pt_conn_tcb_t *pt_conn_alloc_tcb(pt_conn_instance_t *instance,
     memset(tcb, 0, sizeof(pt_conn_tcb_t));
 
     tcb->remote_addr_num = remote_addr_num;
-    memcpy(tcb->remote_addr, remote_addr, 
+    memcpy(tcb->remote_addr, remote_addr,
         sizeof(pt_sockaddr_storage_t) * remote_addr_num);
 
     tcb->st_nfd = NULL;
@@ -117,13 +117,13 @@ pt_conn_tcb_t *pt_conn_alloc_tcb(pt_conn_instance_t *instance,
     return tcb;
 }
 
-void pt_conn_free_tcb(pt_conn_tcb_t *tcb) 
+void pt_conn_free_tcb(pt_conn_tcb_t *tcb)
 {
     list_del(&tcb->node);
     pt_free(tcb);
 }
 
-pt_conn_tcb_t *pt_conn_locate_tcb(pt_conn_instance_t *instance, 
+pt_conn_tcb_t *pt_conn_locate_tcb(pt_conn_instance_t *instance,
                       pt_sockaddr_storage_t *remote_addr,
                       pt_uint32_t remote_addr_num)
 {
@@ -151,17 +151,17 @@ pt_conn_tcb_t *pt_conn_locate_tcb(pt_conn_instance_t *instance,
 st_netfd_t pt_conn_open_instance(pt_conn_instance_t *instance)
 {
     if (instance->st_nfd == NULL) {
-        PT_LOG(PTLOG_DEBUG, "*%s, protocol = %d, service = %d.", 
-            pt_addr_a(&instance->local_addr[0]), 
-            instance->protocol, 
+        PT_LOG(PTLOG_DEBUG, "*%s, protocol = %d, service = %d.",
+            pt_addr_a(&instance->local_addr[0]),
+            instance->protocol,
             instance->service);
-        
+
         if (instance->protocol == PT_PROTOCOL_SCTP) {
             instance->st_nfd = pt_sctp_open_instance(instance);
         } else {
             instance->st_nfd = pt_tcp_open_instance(instance);
         }
-        
+
         if (instance->st_nfd == NULL) {
             PT_LOG(PTLOG_ERROR, "open_instance failed!");
         }
@@ -176,9 +176,9 @@ void pt_conn_accpet(pt_conn_instance_t *instance)
     pt_sockaddr_storage_t sockaddr;
     pt_socklen_t addrlen;
     st_netfd_t st_nfd;
-        
+
     addrlen = instance->addrlen;
-    st_nfd = st_accept(instance->st_nfd, (pt_sockaddr_t *)&sockaddr, 
+    st_nfd = st_accept(instance->st_nfd, (pt_sockaddr_t *)&sockaddr,
                     (int *)&addrlen, ST_UTIME_NO_TIMEOUT);
     if (st_nfd == NULL){
         return;
@@ -192,17 +192,17 @@ void pt_conn_accpet(pt_conn_instance_t *instance)
         tcb->st_nfd = st_nfd;
         pt_tcp_accpeted(tcb);
     } else {
-        PT_LOG(PTLOG_INFO, "*%s <-> *%s, protocol = %d, match failed, tcb = %p!", 
-            pt_addr_a(&instance->local_addr[0]), 
-            pt_addr_a(&sockaddr), 
-            instance->protocol, 
+        PT_LOG(PTLOG_INFO, "*%s <-> *%s, protocol = %d, match failed, tcb = %p!",
+            pt_addr_a(&instance->local_addr[0]),
+            pt_addr_a(&sockaddr),
+            instance->protocol,
             tcb);
         st_netfd_close(st_nfd);
         return;
     }
-    PT_LOG(PTLOG_INFO, "*%s <-> *%s, protocol = %d, accepted successful.", 
-        pt_addr_a(&instance->local_addr[0]), 
-        pt_addr_a(&sockaddr), 
+    PT_LOG(PTLOG_INFO, "*%s <-> *%s, protocol = %d, accepted successful.",
+        pt_addr_a(&instance->local_addr[0]),
+        pt_addr_a(&sockaddr),
         instance->protocol);
 }
 
@@ -212,21 +212,21 @@ void pt_conn_connect(pt_conn_instance_t *instance)
     pt_conn_tcb_t *tcb;
 
     tcb = list_entry(instance->list_tcb.next, pt_conn_tcb_t, node);
-    
-    rtn = st_connect(instance->st_nfd, (pt_sockaddr_t *)&tcb->remote_addr[0], 
+
+    rtn = st_connect(instance->st_nfd, (pt_sockaddr_t *)&tcb->remote_addr[0],
                 (int)instance->addrlen, ST_UTIME_NO_TIMEOUT);
     if (rtn < 0 && errno != 106/*already connected*/) {
-        PT_LOG(PTLOG_INFO, "*%s <-> *%s, protocol = %d, connected failed, reason = %s.", 
-            pt_addr_a(&instance->local_addr[0]), 
-            pt_addr_a(&tcb->remote_addr[0]), 
-            instance->protocol, 
+        PT_LOG(PTLOG_INFO, "*%s <-> *%s, protocol = %d, connected failed, reason = %s.",
+            pt_addr_a(&instance->local_addr[0]),
+            pt_addr_a(&tcb->remote_addr[0]),
+            instance->protocol,
             strerror(errno));
         return;
     }
 
-    PT_LOG(PTLOG_INFO, "*%s <-> *%s, protocol = %d, connected successful.", 
-        pt_addr_a(&instance->local_addr[0]), 
-        pt_addr_a(&tcb->remote_addr[0]), 
+    PT_LOG(PTLOG_INFO, "*%s <-> *%s, protocol = %d, connected successful.",
+        pt_addr_a(&instance->local_addr[0]),
+        pt_addr_a(&tcb->remote_addr[0]),
         instance->protocol);
 
     tcb->st_nfd = instance->st_nfd;
@@ -254,8 +254,8 @@ void *pt_conn_monitor_instance(void *arg)
     for (;;)  {
         if (NULL == pt_conn_open_instance(instance)) {
             PT_LOG(PTLOG_ERROR, "open instance failed!");
-        } else if (instance->service == PT_SERVICE_CLI && 
-                (tcb->sk_status != PT_STATUS_ESTABLISHED && 
+        } else if (instance->service == PT_SERVICE_CLI &&
+                (tcb->sk_status != PT_STATUS_ESTABLISHED &&
                  tcb->sk_status != PT_STATUS_CONNECTING)) {
             pt_conn_connect(instance);
         } else if (instance->service == PT_SERVICE_SRV) {
@@ -272,20 +272,20 @@ pt_conn_id_t pt_conn_add(pt_conn_item_t *conn)
 
     instance = NULL;
     if (conn->service == PT_SERVICE_SRV) {
-        instance = pt_conn_locate_instance(conn->protocol, conn->service, 
-                                        conn->local_addr, conn->local_addr_num);
-    } 
-
-    if (instance == NULL) {
-        instance = pt_conn_alloc_instance(conn->protocol, conn->service, 
+        instance = pt_conn_locate_instance(conn->protocol, conn->service,
                                         conn->local_addr, conn->local_addr_num);
     }
-    
+
+    if (instance == NULL) {
+        instance = pt_conn_alloc_instance(conn->protocol, conn->service,
+                                        conn->local_addr, conn->local_addr_num);
+    }
+
     tcb = pt_conn_alloc_tcb(instance, conn->remote_addr, conn->remote_addr_num, conn->sctp_ppid,
                         conn->handle_data_func, conn->handle_data_func_arg);
 
     if (instance->st_thread == NULL) {
-        instance->st_thread = st_thread_create(pt_conn_monitor_instance, 
+        instance->st_thread = st_thread_create(pt_conn_monitor_instance,
                                             (void *)instance, 0, 0);
     }
 
@@ -298,7 +298,7 @@ void pt_conn_del(pt_conn_id_t conn_id)
 
     tcb = conn_id;
 
-        
+
     /*暂时无法解决ST线程删除问题*/
 }
 
@@ -336,7 +336,7 @@ void pt_conn_res_reset()
 {
     pt_conn_instance_t *instance;
     pt_conn_tcb_t *tcb;
-        
+
     while (!list_empty(&list_instance)) {
         instance = list_entry(list_instance.next, pt_conn_instance_t, node);
         while (!list_empty(&instance->list_tcb)) {

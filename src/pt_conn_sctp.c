@@ -93,7 +93,7 @@ void pt_sctp_setsockopt_paddrparams(pt_int32_t skfd, pt_sockaddr_storage_t *addr
     opt.spp_flags += SPP_HB_ENABLE;
     opt.spp_hbinterval = 5000;
     opt.spp_pathmaxrxt = 2;
-    
+
     if (pt_setsockopt(skfd, IPPROTO_SCTP, SCTP_PEER_ADDR_PARAMS, &opt, sizeof(opt))) {
         PT_LOG(PTLOG_ERROR, "set failed(%s)!", strerror(errno));
     }
@@ -101,12 +101,12 @@ void pt_sctp_setsockopt_paddrparams(pt_int32_t skfd, pt_sockaddr_storage_t *addr
 
 pt_int32_t pt_sctp_event_assoc_change(struct sctp_assoc_change *sac, pt_conn_tcb_t *tcb)
 {
-    PT_LOG(PTLOG_INFO, "assoc_change: state=%hu, error=%hu, instr=%hu outstr=%hu.", 
+    PT_LOG(PTLOG_INFO, "assoc_change: state=%hu, error=%hu, instr=%hu outstr=%hu.",
             sac->sac_state, sac->sac_error,
             sac->sac_inbound_streams, sac->sac_outbound_streams);
 
     tcb->sctp_status = sac->sac_state;
-    
+
     if (sac->sac_state == SCTP_COMM_UP) {
         tcb->sctp_assoc_id = sac->sac_assoc_id;
         pt_sctp_up(tcb);
@@ -132,14 +132,14 @@ pt_int32_t pt_sctp_handle_event(pt_conn_tcb_t *tcb, void *data, pt_int32_t len)
     snp = data;
 
     PT_LOG(PTLOG_INFO, "*%s <-> *%s, notify event, sn_type = %#x, sn_flags = %u, "
-                        "data= %p, len = %d.", 
-                        pt_addr_a(&tcb->instance->local_addr[0]), 
+                        "data= %p, len = %d.",
+                        pt_addr_a(&tcb->instance->local_addr[0]),
                         pt_addr_a(&tcb->remote_addr[0]),
-                        snp->sn_header.sn_type, 
+                        snp->sn_header.sn_type,
                         snp->sn_header.sn_flags,
                         data,
                         len);
-    rtn = 0;      
+    rtn = 0;
     switch (snp->sn_header.sn_type) {
         case SCTP_ASSOC_CHANGE:
             rtn = pt_sctp_event_assoc_change(&snp->sn_assoc_change, tcb);
@@ -170,9 +170,9 @@ pt_int32_t pt_sctp_handle_event(pt_conn_tcb_t *tcb, void *data, pt_int32_t len)
 pt_int32_t pt_sctp_handle_data(pt_conn_tcb_t *tcb, void *data, pt_int32_t len)
 {
     pt_conn_msg_t conn_msg;
-    
-    PT_LOG(PTLOG_DEBUG, "*%s <-> *%s, recv data = %p len = %d, sctp_assoc_id = %d.", 
-                        pt_addr_a(&tcb->instance->local_addr[0]), 
+
+    PT_LOG(PTLOG_DEBUG, "*%s <-> *%s, recv data = %p len = %d, sctp_assoc_id = %d.",
+                        pt_addr_a(&tcb->instance->local_addr[0]),
                         pt_addr_a(&tcb->remote_addr[0]),
                         data,
                         len,
@@ -201,14 +201,14 @@ pt_int32_t pt_stcp_handle_notify(pt_conn_tcb_t *tcb, void *data, pt_int32_t len)
     conn_msg.msg_type = PT_CONN_MSG_NOTIFY;
     conn_msg.msg.msg_notify.conn_id = tcb;
     conn_msg.msg.msg_notify.conn_status = tcb->sk_status;
-    
+
     return tcb->handle_data_func(tcb->handle_data_func_arg, &conn_msg);
 }
 
 st_netfd_t pt_sctp_open_instance(pt_conn_instance_t *instance)
 {
     int skfd;
-    
+
     skfd = pt_socket(instance->af, PT_SOCK_STREAM, PT_PROTOCOL_SCTP);
     if (skfd < 0) {
         PT_LOG(PTLOG_ERROR, "pt_socket failed(%s)", strerror(errno));
@@ -236,7 +236,7 @@ st_netfd_t pt_sctp_open_instance(pt_conn_instance_t *instance)
         PT_LOG(PTLOG_ERROR, "st_netfd_open_socket failed!");
         return NULL;
     }
-    
+
     pt_sctp_setsockopt_linger(skfd);
     pt_sctp_setsockopt_rcvbuf(skfd);
     pt_sctp_setsockopt_sndbuf(skfd);
@@ -258,8 +258,8 @@ void pt_sctp_close(pt_conn_tcb_t *tcb)
     st_netfd_close(tcb->st_nfd);
     tcb->st_nfd = NULL;
 
-    PT_LOG(PTLOG_ERROR, "*%s <-> *%s, service = %d.", 
-        pt_addr_a(&tcb->instance->local_addr[0]), 
+    PT_LOG(PTLOG_ERROR, "*%s <-> *%s, service = %d.",
+        pt_addr_a(&tcb->instance->local_addr[0]),
         pt_addr_a(&tcb->remote_addr[0]),
         tcb->instance->service);
     if (tcb->instance->service == PT_SERVICE_CLI) {
@@ -295,8 +295,8 @@ void *pt_sctp_recvmsg(void *arg)
     for (;;) {
         count = st_recvmsg(tcb->st_nfd, &inmsg, flag, ST_UTIME_NO_TIMEOUT);
         if (count > 0) {
-            PT_LOG(PTLOG_DEBUG, "*%s <-> *%s, recv msg, sctp_assoc_id = %d.", 
-                                pt_addr_a(&tcb->instance->local_addr[0]), 
+            PT_LOG(PTLOG_DEBUG, "*%s <-> *%s, recv msg, sctp_assoc_id = %d.",
+                                pt_addr_a(&tcb->instance->local_addr[0]),
                                 pt_addr_a(&tcb->remote_addr[0]),
                                 tcb->sctp_assoc_id);
             if (inmsg.msg_flags & MSG_NOTIFICATION) {
@@ -350,14 +350,14 @@ pt_int32_t pt_sctp_send(pt_conn_tcb_t *tcb, pt_uint8_t *data, pt_uint32_t len)
 	flag = MSG_NOSIGNAL;
 
     PT_LOG(PTLOG_DEBUG, "*%s <-> *%s, send msg, data = %p len = %d, "
-                        "sctp_assoc_id = %d, streamid = %d.", 
-                        pt_addr_a(&tcb->instance->local_addr[0]), 
+                        "sctp_assoc_id = %d, streamid = %d.",
+                        pt_addr_a(&tcb->instance->local_addr[0]),
                         pt_addr_a(&tcb->remote_addr[0]),
                         data,
                         len,
                         tcb->sctp_assoc_id,
                         sinfo->sndrcv.sinfo_stream);
-    
+
     return st_sendmsg(tcb->st_nfd, &outmsg, flag, ST_UTIME_NO_TIMEOUT);
 }
 
@@ -380,7 +380,7 @@ void pt_sctp_connected(pt_conn_tcb_t *tcb)
 void pt_sctp_accpeted(pt_conn_tcb_t *tcb)
 {
     pt_sctp_setsockopt_paddrparams(st_netfd_fileno(tcb->st_nfd), &tcb->remote_addr[0]);
-    
+
     tcb->st_thread = st_thread_create(pt_sctp_recvmsg, (void *)tcb, 0, 0);
 
     tcb->sk_status = PT_STATUS_ESTABLISHED;
