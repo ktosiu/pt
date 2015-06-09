@@ -61,10 +61,10 @@ Possible options:
 (_pid=$(ps -ef|awk '/\.\/[o]bj\/pt/{print $2}') && kill -SIGUSR1 $_pid)
 
 #start
- (_pid=$(ps -ef|awk '/\.\/[o]bj\/pt/{print $2}') && kill -SIGUSR2 $_pid)
+(_pid=$(ps -ef|awk '/\.\/[o]bj\/pt/{print $2}') && kill -SIGUSR2 $_pid)
 
 #stop
- (_pid=$(ps -ef|awk '/\.\/[o]bj\/pt/{print $2}') && kill -9 $_pid)
+(_pid=$(ps -ef|awk '/\.\/[o]bj\/pt/{print $2}') && kill -9 $_pid)
 ```
 
 
