@@ -14,8 +14,11 @@ modprobe sctp
 ----------
 
 libxml2-devel-2.6.23-15.20.x86_64.rpm
+
 lksctp-tools-1.0.10-5.el6.x86_64.rpm
+
 lksctp-tools-devel-1.0.10-5.el6.x86_64.rpm
+
 
 编译
 ====
