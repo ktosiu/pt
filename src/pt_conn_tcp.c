@@ -41,9 +41,9 @@ void pt_tcp_setsockopt_sndbuf(pt_int32_t skfd)
 pt_int32_t pt_tcp_handle_data(pt_conn_tcb_t *tcb, void *data, pt_int32_t len)
 {
     pt_conn_msg_t conn_msg;
-    
-    PT_LOG(PTLOG_DEBUG, "*%s <-> *%s, recv data = %p len = %d", 
-                        pt_addr_a(&tcb->instance->local_addr[0]), 
+
+    PT_LOG(PTLOG_DEBUG, "*%s <-> *%s, recv data = %p len = %d",
+                        pt_addr_a(&tcb->instance->local_addr[0]),
                         pt_addr_a(&tcb->remote_addr[0]),
                         data,
                         len);
@@ -67,14 +67,14 @@ pt_int32_t pt_tcp_handle_notify(pt_conn_tcb_t *tcb, void *data, pt_int32_t len)
     conn_msg.msg_type = PT_CONN_MSG_NOTIFY;
     conn_msg.msg.msg_notify.conn_id = tcb;
     conn_msg.msg.msg_notify.conn_status = tcb->sk_status;
-    
+
     return tcb->handle_data_func(tcb->handle_data_func_arg, &conn_msg);
 }
 
 st_netfd_t pt_tcp_open_instance(pt_conn_instance_t *instance)
 {
     int skfd;
-    
+
     skfd = pt_socket(instance->af, PT_SOCK_STREAM, PT_PROTOCOL_TCP);
     if (skfd < 0) {
         PT_LOG(PTLOG_ERROR, "pt_socket failed(%s)", strerror(errno));
@@ -102,7 +102,7 @@ st_netfd_t pt_tcp_open_instance(pt_conn_instance_t *instance)
         PT_LOG(PTLOG_ERROR, "st_netfd_open_socket failed!");
         return NULL;
     }
-    
+
     pt_tcp_setsockopt_linger(skfd);
     pt_tcp_setsockopt_rcvbuf(skfd);
     pt_tcp_setsockopt_sndbuf(skfd);
@@ -142,7 +142,7 @@ void *pt_tcp_recvmsg(void *arg)
     iov.iov_len = sizeof(_pt_tcp_recvbuf);
     inmsg.msg_iov = &iov;
     inmsg.msg_iovlen = 1;
-    
+
     for (;;) {
         count = st_recvmsg(tcb->st_nfd, &inmsg, flag, ST_UTIME_NO_TIMEOUT);
         if (count > 0) {
@@ -199,7 +199,7 @@ pt_int32_t pt_tcp_send(pt_conn_tcb_t *tcb, pt_uint8_t *data, pt_uint32_t len)
     outmsg.msg_iovlen = 1;
 
 	flag = MSG_NOSIGNAL;
-    
+
     return st_sendmsg(tcb->st_nfd, &outmsg, flag, ST_UTIME_NO_TIMEOUT);
 }
 

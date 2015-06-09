@@ -19,24 +19,24 @@ int pt_ots_create_thread(
 	pthread_attr_t thread_attr;
 
 	pthread_attr_init(&thread_attr);
-	
+
 #ifdef THREAD_TYPE_DETACHED
     pthread_attr_setdetachstate(&thread_attr, PTHREAD_CREATE_DETACHED);
 #else
     pthread_attr_setdetachstate(&thread_attr, PTHREAD_CREATE_JOINABLE);
 #endif
-	
+
 	pthread_attr_setscope(&thread_attr, PTHREAD_SCOPE_SYSTEM);
 	if (stack > 0)
 	{
 		pthread_attr_setstacksize(&thread_attr, stack);
 	}
-	
-	if (0 != pthread_create(thread_id, &thread_attr, (void *(*)(void *))thread_func, parg)) 
+
+	if (0 != pthread_create(thread_id, &thread_attr, (void *(*)(void *))thread_func, parg))
 	{
         return -0xff;
-	} 
-	else 
+	}
+	else
 	{
         return 0;
 	}
@@ -73,7 +73,7 @@ void pt_ots_send_msg(unsigned long seq)
                 continue;
             if (!pt_diam_get_cmd_flg_R(msg->msg_data, msg->msg_data_len))
                 continue;
-            PT_LOG(PTLOG_DEBUG, "send msgflow_name = %s, inst_name = %s, msg_name = %s, seq = %lu.", 
+            PT_LOG(PTLOG_DEBUG, "send msgflow_name = %s, inst_name = %s, msg_name = %s, seq = %lu.",
                     msgflow->msgflow_name, inst->inst_name, msg->msg_name, seq);
             pt_task_send_diam_arg_msg(msg, seq);
         } else {
@@ -108,7 +108,7 @@ void pt_ots_create_kvp(char *key, long *count)
 
 void pt_ots_create_kvp_run(void)
 {
-    pt_ots_create_kvp("0_ots_run", &_total_send); 
+    pt_ots_create_kvp("0_ots_run", &_total_send);
 }
 
 void pt_ots_create_kvp_msg(void)
@@ -177,7 +177,7 @@ void *pt_ots_st_l_thread(void *arg)
     pt_diam_dump();
     pt_uc_dump();
 
-    pt_ots_open_kvp(); 
+    pt_ots_open_kvp();
 
     if (_count_send == 0)
         _count_send = 1;
@@ -188,7 +188,7 @@ void *pt_ots_st_l_thread(void *arg)
             pt_ots_send_msg(_already_send % _count_send);
             _already_send++;
             interval_send--;
-            PT_LOG(PTLOG_DEBUG, "send %lu/%lu, --pid = %lu --tid = %lu.", 
+            PT_LOG(PTLOG_DEBUG, "send %lu/%lu, --pid = %lu --tid = %lu.",
                     _already_send, _total_send, pt_getpid(), pt_gettid());
         }
         st_usleep(50000);/*50ms*/
@@ -231,7 +231,7 @@ static void pt_ots_mod_destroy(void)
 static int pt_ots_init(struct proc_method_s *method)
 {
     if (_st_thread_id != 0) {
-        PT_LOG(PTLOG_ERROR, "already inited, --pid = %lu --tid = %lu.", 
+        PT_LOG(PTLOG_ERROR, "already inited, --pid = %lu --tid = %lu.",
                 pt_getpid(), pt_gettid());
         return 0;
     }
@@ -245,14 +245,14 @@ static int pt_ots_init(struct proc_method_s *method)
         return -0xfe;
     }
 
-    PT_LOG(PTLOG_DEBUG, "init ok, --pid = %lu --tid = %lu.", 
+    PT_LOG(PTLOG_DEBUG, "init ok, --pid = %lu --tid = %lu.",
                 pt_getpid(), pt_gettid());
 
     return 0;
 }
 
 static int pt_ots_run(void* param)
-{ 
+{
     pmf->_status(0);
     _total_send++;
     PT_LOG(PTLOG_DEBUG, "run %lu/%lu.", _already_send, _total_send);
@@ -267,11 +267,11 @@ static void pt_ots_exit(void)
 
 static proc_export_t  pt_ots_proc = {
     pt_ots_init,
-    pt_ots_run,    
+    pt_ots_run,
     pt_ots_exit
 };
 
-static char *pt_ots_state_meanings[] = {"send"};    
+static char *pt_ots_state_meanings[] = {"send"};
 
 struct module_exports exports = {
 	"pt_ots",
@@ -288,7 +288,7 @@ struct module_exports exports = {
 
 /* OTS 内部协商 */
 int get_ifversion(void)
-{ 
-    return VERSION_2; 
+{
+    return VERSION_2;
 }
 

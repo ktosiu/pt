@@ -122,8 +122,8 @@ void pt_uc_free_msg(pt_uc_msg_t *msg)
     pt_free(msg);
 }
 
-pt_uc_msg_id_t pt_uc_add_msg(pt_uc_inst_id_t inst_id, 
-                    pt_char_t *msg_name, pt_int32_t msg_action, pt_int32_t msg_type, 
+pt_uc_msg_id_t pt_uc_add_msg(pt_uc_inst_id_t inst_id,
+                    pt_char_t *msg_name, pt_int32_t msg_action, pt_int32_t msg_type,
                     pt_uint8_t *msg_data, pt_int32_t msg_data_len)
 {
     pt_uc_msg_t *msg;
@@ -159,7 +159,7 @@ void pt_uc_set_msg_linkid(pt_uc_msg_id_t msg_id, pt_uint32_t msg_link_id)
     msg->msg_link_id = msg_link_id;
 }
 
-void pt_uc_set_msg_param_ss7(pt_uc_msg_id_t msg_id, 
+void pt_uc_set_msg_param_ss7(pt_uc_msg_id_t msg_id,
                 pt_uint8_t acver, pt_uint8_t acvalue, pt_uint8_t comptype, pt_uint8_t opcode,
                 pt_char_t *cda_code, pt_uint8_t cda_ssn, pt_char_t *cga_code, pt_uint8_t cga_ssn)
 {
@@ -176,8 +176,8 @@ void pt_uc_set_msg_param_ss7(pt_uc_msg_id_t msg_id,
     pt_str2bcds(cga_code, (pt_int32_t)strlen(cga_code), msg->msg_ss7_cga_code, NULL);
 }
 
-void pt_uc_add_matchinfo(list_head_t *plist, 
-                pt_int32_t data_type, pt_char_t *data, pt_int32_t data_len, 
+void pt_uc_add_matchinfo(list_head_t *plist,
+                pt_int32_t data_type, pt_char_t *data, pt_int32_t data_len,
                 pt_char_t *strtag)
 {
     pt_uc_matchinfo_t *matchinfo;
@@ -193,28 +193,28 @@ void pt_uc_add_matchinfo(list_head_t *plist,
     matchinfo->data_type = data_type;
     memcpy(matchinfo->data, data, (pt_uint32_t)data_len);
     matchinfo->data_len = data_len;
-    
+
     list_add_tail(&matchinfo->node, plist);
 }
 
-void pt_uc_add_msg_uid(pt_uc_msg_id_t msg_id, 
-                pt_int32_t uid_type, pt_char_t *uid, pt_int32_t uid_len, 
+void pt_uc_add_msg_uid(pt_uc_msg_id_t msg_id,
+                pt_int32_t uid_type, pt_char_t *uid, pt_int32_t uid_len,
                 pt_char_t *strtag)
 {
     pt_uc_add_matchinfo(&((pt_uc_msg_t *)msg_id)->list_msg_uid,
             uid_type, uid, uid_len, strtag);
 }
 
-void pt_uc_add_msg_replace(pt_uc_msg_id_t msg_id, 
-                pt_int32_t replace_type, pt_char_t *replace, pt_int32_t replace_len, 
+void pt_uc_add_msg_replace(pt_uc_msg_id_t msg_id,
+                pt_int32_t replace_type, pt_char_t *replace, pt_int32_t replace_len,
                 pt_char_t *strtag)
 {
     pt_uc_add_matchinfo(&((pt_uc_msg_t *)msg_id)->list_msg_replace,
             replace_type, replace, replace_len, strtag);
 }
 
-void pt_uc_add_msg_condition(pt_uc_msg_id_t msg_id, 
-                pt_int32_t condition_type, pt_char_t *condition, pt_int32_t condition_len, 
+void pt_uc_add_msg_condition(pt_uc_msg_id_t msg_id,
+                pt_int32_t condition_type, pt_char_t *condition, pt_int32_t condition_len,
                 pt_char_t *strtag)
 {
     pt_uc_add_matchinfo(&((pt_uc_msg_t *)msg_id)->list_msg_condition,
@@ -324,7 +324,7 @@ void pt_uc_dump()
                     msg->msg_stat_minrtt,
                     msg->msg_stat_totalrtt/(msg->msg_stat_totalrttnum + 1),
                     msgflow->runing_state
-                    );                    
+                    );
             }
         }
     }

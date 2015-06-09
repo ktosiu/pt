@@ -40,7 +40,7 @@ void pt_task_update_ss7_bytes_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_match
     pt_bytes2str((pt_uint8_t *)ss7_uid->data, ss7_uid->data_len, str_uid, &str_uid_len);
 
     pt_str_add(str_seq, str_uid, str_result, 16);
-    
+
     uid_len = sizeof(uid);
     pt_str2bytes(str_result, (pt_int32_t)strlen(str_result), (pt_uint8_t *)uid, &uid_len);
 
@@ -73,11 +73,11 @@ void pt_task_update_ss7_bcd_uid(pt_uc_msg_t *msg, pt_uint64_t seq, pt_uc_matchin
     sprintf(str_seq, "%lx", seq);
 
     str_uid_len = sizeof(str_uid);
-    pt_bcds2str((pt_uint8_t *)ss7_uid->data, 
+    pt_bcds2str((pt_uint8_t *)ss7_uid->data,
             pt_bcdlen((pt_uint8_t *)ss7_uid->data), str_uid, &str_uid_len);
 
     pt_str_add(str_seq, str_uid, str_result, 10);
-    
+
     uid_len = sizeof(uid);
     pt_str2bcds(str_result, (pt_int32_t)strlen(str_result), (pt_uint8_t *)uid, &uid_len);
 
@@ -164,15 +164,15 @@ pt_task_pdb_t *pt_task_locate_ss7_pdb(gtcap_msg_t *gtcap_msg)
     pt_uint32_t id;
 
     tran_id = NULL;
-    if (gtcap_msg->m_type == GTCAP_CONTINUE_TAG_TYPE) 
+    if (gtcap_msg->m_type == GTCAP_CONTINUE_TAG_TYPE)
         tran_id = &gtcap_msg->m_cont.dest_id;
-    else if (gtcap_msg->m_type == GTCAP_END_TAG_TYPE) 
+    else if (gtcap_msg->m_type == GTCAP_END_TAG_TYPE)
         tran_id = &gtcap_msg->m_end.dest_id;
-    else if (gtcap_msg->m_type == GTCAP_END_TAG_TYPE) 
+    else if (gtcap_msg->m_type == GTCAP_END_TAG_TYPE)
         tran_id = &gtcap_msg->m_abort.dest_id;
-    else 
+    else
         tran_id = NULL;
-    
+
     if (tran_id == NULL)
         return NULL;
 
@@ -216,7 +216,7 @@ pt_task_ss7_local_invokeinfo_alloc(pt_task_pdb_t *pdb, pt_uint8_t opcode)
 
     if (pdb->ss7_local_invokeinfo_num >= PT_ARRAY_SIZE(pdb->ss7_local_invokeinfo))
         return NULL;
-    
+
     ss7_invokeinfo = &pdb->ss7_local_invokeinfo[pdb->ss7_local_invokeinfo_num++];
     ss7_invokeinfo->ss7_utime = st_utime();
     ss7_invokeinfo->ss7_invokeid = 1;
@@ -258,7 +258,7 @@ pt_task_ss7_peer_invokeinfo_alloc(pt_task_pdb_t *pdb, pt_uint8_t opcode)
 
     if (pdb->ss7_peer_invokeinfo_num >= PT_ARRAY_SIZE(pdb->ss7_peer_invokeinfo))
         return NULL;
-    
+
     ss7_invokeinfo = &pdb->ss7_peer_invokeinfo[pdb->ss7_peer_invokeinfo_num++];
     ss7_invokeinfo->ss7_utime = st_utime();
     ss7_invokeinfo->ss7_invokeid = 1;
@@ -298,7 +298,7 @@ pt_uc_msg_t *pt_task_this_ss7_recv_begin_msg(pt_uint8_t opcode)
         }
     }
 
-    return NULL;    
+    return NULL;
 }
 
 /*同inst内查找接收msg*/
@@ -339,7 +339,7 @@ pt_uc_msg_t *pt_task_next_ss7_begin_msg(pt_uc_msg_t *current_msg)
         }
     }
 
-    return NULL;    
+    return NULL;
 }
 
 /*获取同inst内的后续发送消息*/
@@ -347,9 +347,9 @@ pt_uc_msg_t *pt_task_next_ss7_send_msg(pt_uc_msg_t *current_msg)
 {
     pt_uc_msg_t *next_msg;
 
-    if (pt_task_last_msg(current_msg)) 
+    if (pt_task_last_msg(current_msg))
         return NULL;
-    
+
     next_msg = list_entry(current_msg->node.next, pt_uc_msg_t, node);
     if (next_msg->msg_action != MSG_ACTION_SEND)
         return NULL;
@@ -361,9 +361,9 @@ pt_uc_msg_t *pt_task_next_ss7_recv_msg(pt_uc_msg_t *current_msg)
 {
     pt_uc_msg_t *next_msg;
 
-    if (pt_task_last_msg(current_msg)) 
+    if (pt_task_last_msg(current_msg))
         return NULL;
-    
+
     next_msg = list_entry(current_msg->node.next, pt_uc_msg_t, node);
     if (next_msg->msg_action != MSG_ACTION_RECEIVE)
         return NULL;
@@ -371,8 +371,8 @@ pt_uc_msg_t *pt_task_next_ss7_recv_msg(pt_uc_msg_t *current_msg)
     return next_msg;
 }
 
-pt_int32_t pt_task_send_ss7_end_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pdb, 
-                            pt_uc_msg_t *end_msg, pt_uint64_t seq) 
+pt_int32_t pt_task_send_ss7_end_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pdb,
+                            pt_uc_msg_t *end_msg, pt_uint64_t seq)
 {
     pt_task_ss7_invokeinfo_t *ss7_invokeinfo;
 
@@ -424,7 +424,7 @@ pt_int32_t pt_task_send_ss7_end_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pdb,
         return -0xfe;
     }
 
-    PT_LOG(PTLOG_DEBUG, "send end msg to sccp, %s-%s", 
+    PT_LOG(PTLOG_DEBUG, "send end msg to sccp, %s-%s",
             pt_addr_a(&m3ua_asp->conn_item.local_addr[0]),
             pt_addr_a(&m3ua_asp->conn_item.remote_addr[0]));
 
@@ -446,7 +446,7 @@ pt_int32_t pt_task_send_ss7_end_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pdb,
     return -0x88;
 }
 
-pt_int32_t pt_task_send_ss7_cont_arg_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pdb, 
+pt_int32_t pt_task_send_ss7_cont_arg_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pdb,
                             pt_uc_msg_t *cont_msg, pt_uint64_t seq)
 {
     pt_task_ss7_invokeinfo_t *ss7_invokeinfo;
@@ -514,11 +514,11 @@ pt_int32_t pt_task_send_ss7_cont_arg_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pd
         cont_msg->msg_stat_fail++;
     else
         cont_msg->msg_stat_success++;
-    
+
     return 0;
 }
 
-pt_int32_t pt_task_send_ss7_cont_ack_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pdb, 
+pt_int32_t pt_task_send_ss7_cont_ack_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pdb,
                             pt_uc_msg_t *cont_msg, pt_uint64_t seq)
 {
     pt_task_ss7_invokeinfo_t *ss7_invokeinfo;
@@ -581,21 +581,21 @@ pt_int32_t pt_task_send_ss7_cont_ack_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pd
         cont_msg->msg_stat_fail++;
     else
         cont_msg->msg_stat_success++;
-    
+
     return 0;
 }
 
-pt_int32_t pt_task_send_ss7_cont_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pdb, 
-                            pt_uc_msg_t *cont_msg, pt_uint64_t seq) 
+pt_int32_t pt_task_send_ss7_cont_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pdb,
+                            pt_uc_msg_t *cont_msg, pt_uint64_t seq)
 {
     pt_int32_t result = -1;
 
-    if (cont_msg->msg_ss7_comptype == PT_UC_MSG_SS7_INVOKE)  
+    if (cont_msg->msg_ss7_comptype == PT_UC_MSG_SS7_INVOKE)
         result = pt_task_send_ss7_cont_arg_msg(m3ua_asp, pdb, cont_msg, seq);
-    else if (cont_msg->msg_ss7_comptype == PT_UC_MSG_SS7_RESPOSE)  
+    else if (cont_msg->msg_ss7_comptype == PT_UC_MSG_SS7_RESPOSE)
         result = pt_task_send_ss7_cont_ack_msg(m3ua_asp, pdb, cont_msg, seq);
 
-    PT_LOG(PTLOG_DEBUG, "send cont msg to sccp, %s-%s", 
+    PT_LOG(PTLOG_DEBUG, "send cont msg to sccp, %s-%s",
             pt_addr_a(&m3ua_asp->conn_item.local_addr[0]),
             pt_addr_a(&m3ua_asp->conn_item.remote_addr[0]));
 
@@ -611,7 +611,7 @@ pt_int32_t pt_task_send_ss7_cont_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pdb,
     return 0;
 }
 
-pt_int32_t pt_task_send_ss7_begin_msg(pt_uc_msg_t *begin_msg, pt_uint64_t seq) 
+pt_int32_t pt_task_send_ss7_begin_msg(pt_uc_msg_t *begin_msg, pt_uint64_t seq)
 {
     pt_task_pdb_t *pdb;
     m3ua_asp_t *m3ua_asp;
@@ -661,15 +661,15 @@ pt_int32_t pt_task_send_ss7_begin_msg(pt_uc_msg_t *begin_msg, pt_uint64_t seq)
         return -0xfe;
     }
 
-    PT_LOG(PTLOG_DEBUG, "send begin msg to sccp, %s-%s", 
+    PT_LOG(PTLOG_DEBUG, "send begin msg to sccp, %s-%s",
             pt_addr_a(&m3ua_asp->conn_item.local_addr[0]),
             pt_addr_a(&m3ua_asp->conn_item.remote_addr[0]));
 
-    pt_sccp_make_address(begin_msg->msg_ss7_cda_code, 
-                         begin_msg->msg_ss7_cda_ssn, 
+    pt_sccp_make_address(begin_msg->msg_ss7_cda_code,
+                         begin_msg->msg_ss7_cda_ssn,
                          &_send_sccp_up_msg.cda);
-    pt_sccp_make_address(begin_msg->msg_ss7_cga_code, 
-                         begin_msg->msg_ss7_cga_ssn, 
+    pt_sccp_make_address(begin_msg->msg_ss7_cga_code,
+                         begin_msg->msg_ss7_cga_ssn,
                          &_send_sccp_up_msg.cga);
 
     _send_sccp_up_msg.pdata = _task_ss7_buf + sizeof(_task_ss7_buf) - _task_ss7_buf_len;
@@ -735,15 +735,15 @@ pt_int32_t pt_task_recv_ss7_end_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pdb)
 }
 
 /*暂支持一来一回的cont, burst方式不支持*/
-pt_int32_t pt_task_recv_ss7_cont_arg_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pdb) 
+pt_int32_t pt_task_recv_ss7_cont_arg_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pdb)
 {
     pt_uc_msg_t *next_msg;
     pt_task_ss7_invokeinfo_t *ss7_invokeinfo;
 
-    ss7_invokeinfo = pt_task_ss7_peer_invokeinfo_locate_by_opcode(pdb, 
+    ss7_invokeinfo = pt_task_ss7_peer_invokeinfo_locate_by_opcode(pdb,
                                 _recv_gtcap_msg.m_cont.comp.i_op_code);
     if (ss7_invokeinfo == NULL) {
-        ss7_invokeinfo = pt_task_ss7_peer_invokeinfo_alloc(pdb, 
+        ss7_invokeinfo = pt_task_ss7_peer_invokeinfo_alloc(pdb,
                                 _recv_gtcap_msg.m_cont.comp.i_op_code);
         if (ss7_invokeinfo == NULL) {
             PT_LOG(PTLOG_DEBUG, "allock peer invokeinfo failed!");
@@ -812,9 +812,9 @@ pt_int32_t pt_task_recv_ss7_cont_ack_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pd
 
 pt_int32_t pt_task_recv_ss7_cont_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pdb)
 {
-    if (_recv_gtcap_msg.m_cont.comp.comp_type == GCOMP_TYPE_INVOKE) 
+    if (_recv_gtcap_msg.m_cont.comp.comp_type == GCOMP_TYPE_INVOKE)
         return pt_task_recv_ss7_cont_arg_msg(m3ua_asp, pdb);
-    else if (_recv_gtcap_msg.m_cont.comp.comp_type == GCOMP_TYPE_RESULT) 
+    else if (_recv_gtcap_msg.m_cont.comp.comp_type == GCOMP_TYPE_RESULT)
         return pt_task_recv_ss7_cont_ack_msg(m3ua_asp, pdb);
 
     return -0xff;
@@ -832,7 +832,7 @@ pt_int32_t pt_task_recv_ss7_begin_msg(m3ua_asp_t *m3ua_asp, pt_task_pdb_t *pdb)
         return -0xff;
     }
 
-    ss7_invokeinfo = pt_task_ss7_peer_invokeinfo_alloc(pdb, 
+    ss7_invokeinfo = pt_task_ss7_peer_invokeinfo_alloc(pdb,
                                     _recv_gtcap_msg.m_begin.comp.i_op_code);
     if (ss7_invokeinfo == NULL) {
         PT_LOG(PTLOG_DEBUG, "alloc peer invokeinfo failed!");
@@ -865,7 +865,7 @@ void pt_task_recv_ss7_msg(m3ua_asp_t *m3ua_asp, sccp_up_msg_t *up_msg)
     }
     _recv_sccp_up_msg = *up_msg;
 
-    PT_LOG(PTLOG_DEBUG, "recv msg from sccp, msgtype = %#04x, %s-%s", 
+    PT_LOG(PTLOG_DEBUG, "recv msg from sccp, msgtype = %#04x, %s-%s",
             _recv_gtcap_msg.m_type,
             pt_addr_a(&m3ua_asp->conn_item.local_addr[0]),
             pt_addr_a(&m3ua_asp->conn_item.remote_addr[0]));

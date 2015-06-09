@@ -25,7 +25,7 @@ pt_int32_t pt_asn1_encode_len_indef(pt_int32_t len, void *buf, pt_int32_t pos)
 {
     if (len != 0x80)
     {
-        return -1;    
+        return -1;
     }
 
     *((pt_uint8_t *)buf + (--pos)) = (pt_uint8_t)len;
@@ -64,7 +64,7 @@ pt_int32_t pt_asn1_encode_tl(pt_uint32_t t, pt_int32_t l, void *buf, pt_int32_t 
 {
     pos = pt_asn1_encode_len(l, buf, pos);
     CHECK_RESULT(pos);
-    
+
     pos = pt_asn1_encode_tag(t, buf, pos);
     CHECK_RESULT(pos);
 
@@ -110,10 +110,10 @@ pt_int32_t pt_asn1_encode_tl_indef(pt_uint32_t t, pt_int32_t l, void *buf, pt_in
 
     pos = pt_asn1_encode_len_indef(0x80, buf, pos);
     CHECK_RESULT(pos);
-    
+
     pos = pt_asn1_encode_tag(t, buf, pos);
     CHECK_RESULT(pos);
-    
+
     return pos;
 }
 
@@ -121,10 +121,10 @@ pt_int32_t pt_asn1_encode_tlv_indef(pt_uint32_t t, pt_int32_t l, void *v, void *
 {
     pos = pt_asn1_encode_v(l, v, buf, pos);
     CHECK_RESULT(pos);
-    
+
     pos = pt_asn1_encode_tl_indef(t, l, buf, pos);
     CHECK_RESULT(pos);
-    
+
     return pos;
 }
 
@@ -162,7 +162,7 @@ pt_int32_t pt_asn1_decode_tag(void *buf, pt_int32_t pos, pt_uint32_t *t)
         for(; *((pt_uint8_t *)buf + pos) & 0x80; pos++)
             *t = (*t << 8) | *((pt_uint8_t *)buf + pos);
     }
-        
+
     return pos;
 }
 
@@ -206,7 +206,7 @@ pt_uint32_t pt_asn1_code_tag(void *buf)
         for(pos = 1; *((pt_uint8_t *)buf + pos) & 0x80; pos++)
             t = (t << 8) | *((pt_uint8_t *)buf + pos);
     }
-        
+
     return t;
 }
 

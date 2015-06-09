@@ -3,13 +3,13 @@
 
 typedef void* pt_conn_id_t;
 
-typedef enum 
+typedef enum
 {
     PT_PROTOCOL_TCP  = 6,
     PT_PROTOCOL_SCTP = 132,
 }pt_conn_protocol_e;
 
-typedef enum 
+typedef enum
 {
     PT_SERVICE_CLI = 1,
     PT_SERVICE_SRV,
@@ -32,7 +32,7 @@ typedef struct pt_conn_instance_s
 
     pt_conn_protocol_e      protocol;
     pt_conn_service_e       service;
-    
+
     pt_int32_t              af;
     pt_socklen_t            addrlen;
 
@@ -40,7 +40,7 @@ typedef struct pt_conn_instance_s
     pt_sockaddr_storage_t   local_addr[PT_MAX_ADDR_NUM];
 
     st_netfd_t              st_nfd;
-    st_thread_t             st_thread; 
+    st_thread_t             st_thread;
 }pt_conn_instance_t;
 
 typedef struct pt_conn_msg_data_s {
@@ -78,7 +78,7 @@ typedef struct pt_conn_tcb_s
     pt_sockaddr_storage_t   remote_addr[PT_MAX_ADDR_NUM];
 
     st_netfd_t              st_nfd;
-    st_thread_t             st_thread; 
+    st_thread_t             st_thread;
 
     pt_uint32_t             sctp_ppid;
     sctp_assoc_t            sctp_assoc_id;
@@ -92,7 +92,7 @@ typedef struct pt_conn_tcb_s
     pt_uint32_t             seq;
 
     /*attaching instance*/
-    pt_conn_instance_t      *instance; 
+    pt_conn_instance_t      *instance;
 }pt_conn_tcb_t;
 
 /*
@@ -110,15 +110,15 @@ typedef struct pt_conn_item_s
 {
     pt_conn_protocol_e      protocol;
     pt_conn_service_e       service;
-    
+
     pt_uint32_t             local_addr_num;
     pt_sockaddr_storage_t   local_addr[PT_MAX_ADDR_NUM];
-    
+
     pt_uint32_t             remote_addr_num;
     pt_sockaddr_storage_t   remote_addr[PT_MAX_ADDR_NUM];
 
     pt_uint32_t             sctp_ppid;
-    
+
     _PT_HANDLE_DATA         handle_data_func;
     void *                  handle_data_func_arg;
 }pt_conn_item_t;
