@@ -1,5 +1,7 @@
+准备工作
+=======
 准备sctp内核包加载
-=================
+-----------------
 
 ```bash
 #如果SCTP内核模块没有加载则执行如下指令加载
@@ -8,26 +10,31 @@ lsmod |grep sctp
 modprobe sctp     
 ```
 
-cgsl64环境依赖包准备
-===================
+依赖包准备
+----------
 
-- libxml2-devel-2.6.23-15.20.x86_64.rpm
-- lksctp-tools-1.0.10-5.el6.x86_64.rpm
-- lksctp-tools-devel-1.0.10-5.el6.x86_64.rpm
+libxml2-devel-2.6.23-15.20.x86_64.rpm
 
-sid生成规则 
-==========
+lksctp-tools-1.0.10-5.el6.x86_64.rpm
 
-用例中的SID;pidxxxx:xxxxxxxx
+lksctp-tools-devel-1.0.10-5.el6.x86_64.rpm
 
 
-配置规则
+编译
+====
+
+```bash
+cd src
+make clean && make
+```
+
+配置文件
 ========
 
-执行程序    | 配置事例
-------------|-------------------
-pt\_ots.so  | pt\_ots.cfg
-pt.out      | pt.cfg
+执行程序    | 配置事例     |备注
+------------|--------------|-------------------
+pt\_ots.so  | pt\_ots.cfg  |中移ots测试平台使用
+pt.out      | pt.cfg       |
 
 
 pt.out使用
@@ -47,14 +54,17 @@ Possible options:
         -b <cpuid>              Bind CPU.
         -i                      Run in interactive mode.
 
+#open
+./obj/pt.out -c pt.cfg -u pt.cfg -r pt.cfg -i
+
 #check
- (_pid=$(ps -ef|awk '/\.\/[o]bj\/pt/{print $2}') && kill -SIGUSR1 $_pid)
+(_pid=$(ps -ef|awk '/\.\/[o]bj\/pt/{print $2}') && kill -SIGUSR1 $_pid)
 
 #start
- (_pid=$(ps -ef|awk '/\.\/[o]bj\/pt/{print $2}') && kill -SIGUSR2 $_pid)
+(_pid=$(ps -ef|awk '/\.\/[o]bj\/pt/{print $2}') && kill -SIGUSR2 $_pid)
 
 #stop
- (_pid=$(ps -ef|awk '/\.\/[o]bj\/pt/{print $2}') && kill -9 $_pid)
+(_pid=$(ps -ef|awk '/\.\/[o]bj\/pt/{print $2}') && kill -9 $_pid)
 ```
 
 
