@@ -54,7 +54,7 @@ Possible options:
         -i                      Run in interactive mode.
 
 #open
-build/bin/pt -c pt.cfg -u pt.cfg -r pt.cfg -i
+build/bin/pt -c ./src/pt.cfg -u ./src/pt.cfg -r ./src/pt.cfg -i
 
 #check
 (_pid=$(ps -ef|awk '/\.\/[b]in\/pt/{print $2}') && kill -SIGUSR1 $_pid)
