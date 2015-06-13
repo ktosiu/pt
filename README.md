@@ -13,28 +13,27 @@ modprobe sctp
 依赖包准备
 ----------
 
-libxml2-devel-2.6.23-15.20.x86_64.rpm
+libxml2-devel-2.6.23-15.20.x86\_64.rpm
 
-lksctp-tools-1.0.10-5.el6.x86_64.rpm
+lksctp-tools-1.0.10-5.el6.x86\_64.rpm
 
-lksctp-tools-devel-1.0.10-5.el6.x86_64.rpm
+lksctp-tools-devel-1.0.10-5.el6.x86\_64.rpm
 
 
 编译
 ====
 
 ```bash
-cd src
-make clean && make
+(rm -rf build && mkdir build && cd build && cmake .. && make)
 ```
 
 配置文件
 ========
 
-执行程序    | 配置事例     |备注
-------------|--------------|-------------------
-pt\_ots.so  | pt\_ots.cfg  |中移ots测试平台使用
-pt.out      | pt.cfg       |
+执行程序                 | 配置事例     |备注
+-------------------------|--------------|-------------------
+build/bin/libpt\_ots.so  | pt\_ots.cfg  |中移ots测试平台使用
+build/bin/pt             | pt.cfg       |
 
 
 pt.out使用
@@ -42,8 +41,8 @@ pt.out使用
 
 ```bash
 #help
-pt.out --help
-Usage: ./obj/pt.out [<options>]
+pt --help
+Usage: pt [<options>]
 
 Possible options:
 
@@ -55,16 +54,15 @@ Possible options:
         -i                      Run in interactive mode.
 
 #open
-./obj/pt.out -c pt.cfg -u pt.cfg -r pt.cfg -i
+build/bin/pt -c pt.cfg -u pt.cfg -r pt.cfg -i
 
 #check
-(_pid=$(ps -ef|awk '/\.\/[o]bj\/pt/{print $2}') && kill -SIGUSR1 $_pid)
+(_pid=$(ps -ef|awk '/\.\/[b]in\/pt/{print $2}') && kill -SIGUSR1 $_pid)
 
 #start
-(_pid=$(ps -ef|awk '/\.\/[o]bj\/pt/{print $2}') && kill -SIGUSR2 $_pid)
+(_pid=$(ps -ef|awk '/\.\/[b]in\/pt/{print $2}') && kill -SIGUSR2 $_pid)
 
 #stop
-(_pid=$(ps -ef|awk '/\.\/[o]bj\/pt/{print $2}') && kill -9 $_pid)
+(_pid=$(ps -ef|awk '/\.\/[b]in\/pt/{print $2}') && kill -9 $_pid)
 ```
-
 
