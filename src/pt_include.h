@@ -1,7 +1,7 @@
 #ifndef _PT_INCLUDE_H
 #define _PT_INCLUDE_H
 
-#include "./lib/st-1.9/public.h"
+#include "./third/st-1.9/public.h"
 
 #include "pt_os.h"
 #include "pt_func.h"

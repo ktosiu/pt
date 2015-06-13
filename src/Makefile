@@ -65,16 +65,16 @@ clean: libstclean
 	-$(RM) $(OBJ_PATH)
 
 libst:
-	-$(MAKE) -C ./lib/st-1.9 OS="LINUX" BUILD=$(_ST_TYPE) STATIC_ONLY=yes EXTRA_CFLAGS=-fPIC EXAMPLES= DESC= HEADER=
+	-$(MAKE) -C ./third/st-1.9 OS="LINUX" BUILD=$(_ST_TYPE) STATIC_ONLY=yes EXTRA_CFLAGS=-fPIC EXAMPLES= DESC= HEADER=
 
 libstclean:
-	-$(MAKE) -C ./lib/st-1.9 clean
+	-$(MAKE) -C ./third/st-1.9 clean
 
 $(OUT_EXE): $(OBJ_EXE)
-	$(CC) $(CFLAGS) $+ -L./lib/st-1.9/obj -lst -lxml2 -o $@
+	$(CC) $(CFLAGS) $+ -L./third/st-1.9/obj -lst -lxml2 -o $@
 
 $(OUT_OTS): $(OBJ_OTS)
-	$(CC) $(CFLAGS) $+ -L./lib/st-1.9/obj -lst -lxml2 -shared -o $@
+	$(CC) $(CFLAGS) $+ -L./third/st-1.9/obj -lst -lxml2 -shared -o $@
 
 $(OBJ_PATH)/%.o: %.c
 	@if [ ! -d $(OBJ_PATH) ]; then $(MKDIR) $(OBJ_PATH); fi

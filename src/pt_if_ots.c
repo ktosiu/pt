@@ -1,6 +1,6 @@
 #include "pt_include.h"
 #include <pthread.h>
-#include "./lib/ots-1.2/interface.h"
+#include "./third/ots-1.2/interface.h"
 
 struct proc_method_s *pmf = NULL; /*functions from core*/
 pthread_t _st_thread_id;
