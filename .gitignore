@@ -1,4 +1,5 @@
-obj/
-src/lib/st-1.9/obj
-src/lib/st-1.9/LINUX_*/
+build/
+src/third/st-1.9/obj
+src/third/st-1.9/LINUX_*/
 src/VERSION
+cscope.*
