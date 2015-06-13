@@ -36,14 +36,16 @@ set(SRC_MAIN
 #--头文件搜索路径
 include_directories("/usr/include/libxml2")
 
+#--编译选项
+add_definitions("-fPIC")
+
 #--生成文件
-add_library(pt_ots SHARED ${SRC_PT} ${SRC_IF_OTS})
-add_executable(pt ${SRC_PT} ${SRC_MAIN})
+add_library(pt_static STATIC ${SRC_PT})
+add_library(pt_ots SHARED ${SRC_IF_OTS})
+add_executable(pt ${SRC_MAIN})
 
 #--lib依赖
 find_library(LIBST NAMES st PATHS third/st-1.9/obj/)
-target_link_libraries(pt ${LIBST})
-target_link_libraries(pt xml2)
-target_link_libraries(pt_ots ${LIBST})
-target_link_libraries(pt_ots xml2)
+target_link_libraries(pt pt_static ${LIBST} xml2)
+target_link_libraries(pt_ots pt_static ${LIBST} xml2)
 
