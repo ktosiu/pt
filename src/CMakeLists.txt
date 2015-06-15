@@ -40,12 +40,12 @@ include_directories("/usr/include/libxml2")
 add_definitions("-fPIC")
 
 #--生成文件
-add_library(libpt_static STATIC ${SRC_PT})
-add_library(libpt_ots SHARED ${SRC_IF_OTS})
+add_library(pt_static STATIC ${SRC_PT})
+add_library(pt_ots SHARED ${SRC_IF_OTS})
 add_executable(pt ${SRC_MAIN})
 
 #--lib依赖
 find_library(LIBST NAMES st PATHS third/st-1.9/obj/)
-target_link_libraries(pt libpt_static ${LIBST} xml2)
-target_link_libraries(libpt_ots libpt_static ${LIBST} xml2)
+target_link_libraries(pt pt_static ${LIBST} xml2)
+target_link_libraries(pt_ots pt_static ${LIBST} xml2)
 
