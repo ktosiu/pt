@@ -310,9 +310,9 @@ pt_int32_t pt_conn_send(pt_conn_id_t conn_id, pt_uint32_t seq, pt_uint8_t *data,
     tcb->seq = seq;
 
     if (tcb->instance->protocol == PT_PROTOCOL_SCTP) {
-        return pt_sctp_send(tcb, data, len);
+        return pt_sctp_sendmsg(tcb, data, len);
     } else if (tcb->instance->protocol == PT_PROTOCOL_TCP) {
-        return pt_tcp_send(tcb, data, len);
+        return pt_tcp_sendmsg(tcb, data, len);
     }
 
     return -1;

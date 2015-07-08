@@ -6,6 +6,6 @@ void pt_sctp_up(pt_conn_tcb_t *tcb);
 void pt_sctp_close(pt_conn_tcb_t *tcb);
 void pt_sctp_connected(pt_conn_tcb_t *tcb);
 void pt_sctp_accpeted(pt_conn_tcb_t *tcb);
-pt_int32_t pt_sctp_send(pt_conn_tcb_t *tcb, pt_uint8_t *data, pt_uint32_t len);
+pt_int32_t pt_sctp_sendmsg(pt_conn_tcb_t *tcb, pt_uint8_t *data, pt_uint32_t len);
 
 #endif

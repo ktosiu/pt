@@ -319,7 +319,7 @@ void *pt_sctp_recvmsg(void *arg)
     return NULL;
 }
 
-pt_int32_t pt_sctp_send(pt_conn_tcb_t *tcb, pt_uint8_t *data, pt_uint32_t len)
+pt_int32_t pt_sctp_sendmsg(pt_conn_tcb_t *tcb, pt_uint8_t *data, pt_uint32_t len)
 {
     pt_msghdr_t outmsg;
     pt_iover_t iov;

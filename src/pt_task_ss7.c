@@ -657,7 +657,7 @@ pt_int32_t pt_task_send_ss7_begin_msg(pt_uc_msg_t *begin_msg, pt_uint64_t seq)
     m3ua_asp = pt_m3ua_obtain_overload_asp(begin_msg->msg_link_id);
     if (m3ua_asp == NULL) {
         pt_task_free_pdb(pdb);
-        PT_LOG(PTLOG_ERROR, "get asp failed, msg_link_id = %u!", begin_msg->msg_link_id);
+        PT_LOG(PTLOG_INFO, "get asp failed, msg_link_id = %u!", begin_msg->msg_link_id);
         return -0xfe;
     }
 
