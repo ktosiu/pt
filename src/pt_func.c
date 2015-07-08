@@ -12,7 +12,7 @@ pt_char_t *pt_addr_a(pt_sockaddr_storage_t *addr)
 {
     #define _MAX_ADDR_BUF 64
     #define _MAX_ADDR_NUM 8
-    
+
     pt_uint16_t af;
     pt_sockaddr_in_t *sockaddr_in;
     pt_sockaddr_in6_t *sockaddr_in6;
@@ -22,7 +22,7 @@ pt_char_t *pt_addr_a(pt_sockaddr_storage_t *addr)
     pt_uint16_t addr_port;
 
     addr_str = &addr_buf[addr_pos][0];
-    
+
     af = pt_addr_af(addr);
     if (af == PT_AF_INET) {
         sockaddr_in = (pt_sockaddr_in_t *)addr;
@@ -31,13 +31,13 @@ pt_char_t *pt_addr_a(pt_sockaddr_storage_t *addr)
         addr_port = pt_ntohs(sockaddr_in->sin_port);
 
         sprintf(addr_str, "%s:%u", addr_str, addr_port); /*lint !e464*/
-        
+
     } else if (af == PT_AF_INET6) {
         sockaddr_in6 = (pt_sockaddr_in6_t *)addr;
-        
+
         pt_inet_ntop(af, &sockaddr_in6->sin6_addr, addr_str, _MAX_ADDR_BUF);
         addr_port = pt_ntohs(sockaddr_in6->sin6_port);
-        
+
         sprintf(addr_str, "%s:%u", addr_str, addr_port); /*lint !e464*/
     }
     else {
@@ -59,14 +59,14 @@ void pt_addr_n(pt_uint16_t af, pt_char_t *src, pt_uint16_t port, pt_sockaddr_sto
         pt_sockaddr_in = (pt_sockaddr_in_t *)sockaddr;
         pt_sockaddr_in->sin_family = af;
         pt_sockaddr_in->sin_port = pt_htons(port);
-        pt_inet_pton(af, src, &pt_sockaddr_in->sin_addr);    
+        pt_inet_pton(af, src, &pt_sockaddr_in->sin_addr);
     }
     else
     {
         pt_sockaddr_in6 = (pt_sockaddr_in6_t *)sockaddr;
         pt_sockaddr_in6->sin6_family = af;
         pt_sockaddr_in6->sin6_port = pt_htons(port);
-        pt_inet_pton(af, src, &pt_sockaddr_in6->sin6_addr);    
+        pt_inet_pton(af, src, &pt_sockaddr_in6->sin6_addr);
     }
 }
 
@@ -84,13 +84,13 @@ pt_bool_t pt_addr_eq(pt_sockaddr_storage_t *addr_src, pt_sockaddr_storage_t *add
         if (sockaddr_in_src->sin_port != sockaddr_in_dst->sin_port) {
             return PT_FALSE;
         }
-            
-        
-        if (0 != memcmp(&sockaddr_in_src->sin_addr, &sockaddr_in_dst->sin_addr, 
+
+
+        if (0 != memcmp(&sockaddr_in_src->sin_addr, &sockaddr_in_dst->sin_addr,
                             sizeof(sockaddr_in_dst->sin_addr))) {
             return PT_FALSE;
         }
-        
+
     } else {
         sockaddr_in6_src = (pt_sockaddr_in6_t *)addr_src;
         sockaddr_in6_dst = (pt_sockaddr_in6_t *)addr_dst;
@@ -98,9 +98,9 @@ pt_bool_t pt_addr_eq(pt_sockaddr_storage_t *addr_src, pt_sockaddr_storage_t *add
         if (sockaddr_in6_src->sin6_port != sockaddr_in6_dst->sin6_port) {
             return PT_FALSE;
         }
-            
-        
-        if (0 != memcmp(&sockaddr_in6_src->sin6_addr, &sockaddr_in6_dst->sin6_addr, 
+
+
+        if (0 != memcmp(&sockaddr_in6_src->sin6_addr, &sockaddr_in6_dst->sin6_addr,
                             sizeof(sockaddr_in6_dst->sin6_addr))) {
             return PT_FALSE;
         }
@@ -117,7 +117,7 @@ pt_int32_t pt_addr_ne(pt_sockaddr_storage_t *addr_src, pt_sockaddr_storage_t *ad
 static pt_char_t pt_char_add(pt_char_t char1, pt_char_t char2, pt_int32_t *carry, pt_int32_t base)
 {
     pt_char_t a, b, c;
-    static pt_char_t hex_table[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
+    static pt_char_t hex_table[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                                'a', 'b', 'c', 'd', 'e', 'f'};
 
     a = (pt_char_t)tolower(char1);
@@ -222,7 +222,7 @@ pt_char_t *pt_bcds2str(pt_uint8_t *bcds, pt_int32_t bcds_len, pt_char_t *str, pt
     for (i = 0, j = 0; i < bcds_len; i++) {
         if ((i & 1) == 0)
             str[j] = (bcds[i / 2] & 0xf) + '0';
-        else 
+        else
             str[j] = (bcds[i / 2] >> 4) + '0';
         j++;
     }

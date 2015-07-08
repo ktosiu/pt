@@ -7,17 +7,19 @@ static char _arg_config_path[256] = "pt.cfg";
 static char _arg_running_path[256] = "pt.cfg";
 static st_netfd_t _sig_pipe[2];  /* Signal pipe  */
 
-typedef void (*_cmd_func)();
-typedef struct shell_cmd_s {
-    char        *cmd;
-    _cmd_func   cmd_func;
-}shell_cmd_t;
+void pt_cmd_show()
+{
+    pt_diam_dump();
+    pt_m3ua_dump();
+    pt_uc_dump();
+}
 
-shell_cmd_t _shell_cmd[] = {
-    {"show_diam", pt_diam_dump,},
-    {"show_m3ua", pt_m3ua_dump,},
-    {"show_uc",   pt_uc_dump,},
-};
+void pt_cmd_run()
+{
+    if (pt_xml_load_exec(_arg_running_path) < 0) {
+        fprintf(stderr, "load running parameter failed, path = %s!\n", _arg_running_path);
+    }
+}
 
 static void pt_sig_catcher(int signo)
 {
@@ -71,14 +73,10 @@ static void *pt_sig_process(void *arg)
             case SIGTERM:
                 break;
             case SIGUSR1:
-                pt_diam_dump();
-                pt_m3ua_dump();
-                pt_uc_dump();
+                pt_cmd_show();
                 break;
             case SIGUSR2:
-                if (pt_xml_load_exec(_arg_running_path) < 0) {
-                    fprintf(stderr, "load running parameter failed, path = %s!\n", _arg_running_path);
-                }
+                pt_cmd_run();
                 break;
             default:
                 ;
@@ -103,9 +101,12 @@ void pt_shell()
         printf(">>> ");
         fflush(stdout);
         st_read(fd_shell, input, sizeof(input), ST_UTIME_NO_TIMEOUT);
-        for (i = 0; i < PT_ARRAY_SIZE(_shell_cmd); i++)
-            if (!strncmp(input, _shell_cmd[i].cmd, strlen(_shell_cmd[i].cmd)))
-                _shell_cmd[i].cmd_func();
+        if (strstr(input, "show"))
+            pt_cmd_show();
+        else if (strstr(input, "run"))
+            pt_cmd_run();
+        else
+            printf("invalid cmd");
         printf("\n");
     }
 }
