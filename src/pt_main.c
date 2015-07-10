@@ -21,6 +21,15 @@ void pt_cmd_run()
     }
 }
 
+void pt_cmd_help()
+{
+    printf(
+            "show    Show information\n"
+            "run     Run use case\n"
+            "?       Help\n"
+          );
+}
+
 static void pt_sig_catcher(int signo)
 {
     int err, fd;
@@ -105,8 +114,10 @@ void pt_shell()
             pt_cmd_show();
         else if (strstr(input, "run"))
             pt_cmd_run();
+        else if (strstr(input, "?"))
+            pt_cmd_help();
         else
-            printf("invalid cmd");
+            printf("invalid cmd %s", input);
         printf("\n");
     }
 }

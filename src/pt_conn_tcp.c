@@ -15,7 +15,7 @@ void pt_tcp_setsockopt_linger(pt_int32_t skfd)
 {
     struct linger opt = {PT_FALSE, };
 
-    if (pt_setsockopt(skfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
+    if (pt_setsockopt(skfd, SOL_SOCKET, SO_LINGER, &opt, sizeof(opt))) {
         PT_LOG(PTLOG_ERROR, "set failed(%s)", strerror(errno));
     }
 }
