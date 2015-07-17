@@ -41,6 +41,7 @@ pt.out使用
 
 help
 --------
+```bash
 pt --help
 Usage: pt [<options>]
 
@@ -52,10 +53,10 @@ Possible options:
         -l <log_level>          Set log level, 0-DEBUG 1-INFO 2-ERROR default: 2.
         -b <cpuid>              Bind CPU.
         -i                      Run in interactive mode.
+```
 
 后台运行方式
 --------
-
 ```bash
 #open
 build/bin/pt -c ./src/pt.cfg -u ./src/pt.cfg -r ./src/pt.cfg
