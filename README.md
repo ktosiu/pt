@@ -37,10 +37,10 @@ build/bin/pt             | pt.cfg       |
 
 
 pt.out使用
-=========
+========
 
-```bash
-#help
+help
+--------
 pt --help
 Usage: pt [<options>]
 
@@ -53,8 +53,12 @@ Possible options:
         -b <cpuid>              Bind CPU.
         -i                      Run in interactive mode.
 
+后台运行方式
+--------
+
+```bash
 #open
-build/bin/pt -c ./src/pt.cfg -u ./src/pt.cfg -r ./src/pt.cfg -i
+build/bin/pt -c ./src/pt.cfg -u ./src/pt.cfg -r ./src/pt.cfg
 
 #check
 (_pid=$(ps -ef|awk '/\.\/[b]in\/pt/{print $2}') && kill -SIGUSR1 $_pid)
@@ -66,3 +70,16 @@ build/bin/pt -c ./src/pt.cfg -u ./src/pt.cfg -r ./src/pt.cfg -i
 (_pid=$(ps -ef|awk '/\.\/[b]in\/pt/{print $2}') && kill -9 $_pid)
 ```
 
+shell运行方式
+--------
+
+```bash
+#open
+build/bin/pt -c ./src/pt.cfg -u ./src/pt.cfg -r ./src/pt.cfg -i
+
+#shell
+>>> ? 
+show    Show information of diamlink m3ualink and uc
+run     Run usecase
+?       Help
+```
