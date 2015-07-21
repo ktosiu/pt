@@ -184,7 +184,7 @@ m3ua_as_useage_e pt_m3ua_as_useage(m3ua_as_t *m3ua_as)
  */
 pt_int32_t pt_m3ua_send_data_to_conn(m3ua_asp_t *m3ua_asp, pt_uint8_t *in, pt_int32_t len)
 {
-    PT_LOG(PTLOG_DEBUG, "diam send data to conn, conn_id = %p, in = %p, len = %d", 
+    PT_LOG(PTLOG_DEBUG, "diam send data to conn, conn_id = %p, in = %p, len = %d",
             m3ua_asp->conn_id, in, len);
     m3ua_asp->stat_send++;
 
@@ -290,7 +290,7 @@ pt_int32_t pt_m3ua_asptm_aspac(m3ua_asp_t *m3ua_asp, void *in, pt_int32_t len)
     {
         return -1;
     }
-    
+
     m3ua_asp->asp_status = M3UA_ASP_AC;
     m3ua_asp->seq = 0;
 
@@ -371,13 +371,13 @@ static const _M3UA_MSG_FUNC _m3ua_msg_func[] =
 
 pt_int32_t pt_m3ua_recv_msg_notify(m3ua_asp_t *m3ua_asp, pt_conn_msg_notify_t *conn_msg_notify)
 {
-    PT_LOG(PTLOG_DEBUG, "recv notify msg, conn_id = %p, status = %d!", 
+    PT_LOG(PTLOG_DEBUG, "recv notify msg, conn_id = %p, status = %d!",
         conn_msg_notify->conn_id, conn_msg_notify->conn_status);
 
     m3ua_asp->conn_status = conn_msg_notify->conn_status;
     if (m3ua_asp->conn_status != PT_STATUS_ESTABLISHED) {
         m3ua_asp->asp_status = M3UA_ASP_DOWN;
-    } 
+    }
     return 0;
 }
 
@@ -388,7 +388,7 @@ pt_int32_t pt_m3ua_recv_msg_data(m3ua_asp_t *m3ua_asp, pt_conn_msg_data_t *conn_
 
     memcpy(&msg_header, conn_msg_data->data, sizeof(msg_header));
 
-    PT_LOG(PTLOG_DEBUG, "recv data msg, conn_id = %p, msg_class = %u, msg_type = %u!", 
+    PT_LOG(PTLOG_DEBUG, "recv data msg, conn_id = %p, msg_class = %u, msg_type = %u!",
          conn_msg_data->conn_id, msg_header.msg_class, msg_header.msg_type);
 
     i = _m3ua_msg_mapping[msg_header.msg_class] + msg_header.msg_type;
@@ -399,20 +399,20 @@ pt_int32_t pt_m3ua_recv_msg_data(m3ua_asp_t *m3ua_asp, pt_conn_msg_data_t *conn_
 pt_int32_t pt_m3ua_recv_msg(m3ua_asp_t *m3ua_asp, pt_conn_msg_t *conn_msg)
 {
     pt_int32_t rtn;
-    
+
     m3ua_asp->stat_recv++;
 
-    PT_LOG(PTLOG_DEBUG, "recvmsg, %s-%s", 
+    PT_LOG(PTLOG_DEBUG, "recvmsg, %s-%s",
             pt_addr_a(&m3ua_asp->conn_item.local_addr[0]),
             pt_addr_a(&m3ua_asp->conn_item.remote_addr[0]));
-    
+
     if (conn_msg->msg_type == PT_CONN_MSG_NOTIFY) {
         rtn = pt_m3ua_recv_msg_notify(m3ua_asp, &conn_msg->msg.msg_notify);
     } else if (conn_msg->msg_type == PT_CONN_MSG_DATA) {
         rtn = pt_m3ua_recv_msg_data(m3ua_asp, &conn_msg->msg.msg_data);
     } else {
         PT_LOG(PTLOG_ERROR, "recv invalid msg, msg_type = %d!", conn_msg->msg_type);
-        rtn = -0xfe; 
+        rtn = -0xfe;
     }
 
     return rtn;
@@ -436,7 +436,7 @@ pt_int32_t pt_m3ua_up_asp(m3ua_asp_t *m3ua_asp)
     }
     m3ua_asp->seq = 0;
 
-    PT_LOG(PTLOG_DEBUG, "up asp, %s-%s", 
+    PT_LOG(PTLOG_DEBUG, "up asp, %s-%s",
             pt_addr_a(&m3ua_asp->conn_item.local_addr[0]),
             pt_addr_a(&m3ua_asp->conn_item.remote_addr[0]));
 
@@ -460,7 +460,7 @@ pt_int32_t pt_m3ua_ac_asp(m3ua_asp_t *m3ua_asp)
     }
     m3ua_asp->seq = 0;
 
-    PT_LOG(PTLOG_DEBUG, "active asp, %s-%s", 
+    PT_LOG(PTLOG_DEBUG, "active asp, %s-%s",
             pt_addr_a(&m3ua_asp->conn_item.local_addr[0]),
             pt_addr_a(&m3ua_asp->conn_item.remote_addr[0]));
 
@@ -588,7 +588,7 @@ void pt_m3ua_format_spc(pt_char_t *str_spc, pt_uint8_t bin_spc[3])
     bin_spc[2] = (pt_uint8_t)atoi(str_spc);
 }
 
-ss7office_id_t pt_m3ua_add_ss7office(pt_uint32_t officeid, 
+ss7office_id_t pt_m3ua_add_ss7office(pt_uint32_t officeid,
                         pt_uint8_t spc_type, pt_char_t *dpc, pt_char_t *opc)
 {
     ss7office_t *ss7office;
@@ -606,7 +606,7 @@ ss7office_id_t pt_m3ua_add_ss7office(pt_uint32_t officeid,
 }
 
 m3ua_as_id_t pt_m3ua_add_as(ss7office_id_t ss7office_id,
-                        m3ua_as_useage_e useage, pt_uint32_t n, pt_uint32_t mode, 
+                        m3ua_as_useage_e useage, pt_uint32_t n, pt_uint32_t mode,
                         pt_uint8_t netapp_flag, pt_uint32_t netapp,
                         pt_uint8_t route_context_flag, pt_uint32_t route_context)
 {
@@ -627,7 +627,7 @@ m3ua_as_id_t pt_m3ua_add_as(ss7office_id_t ss7office_id,
     return m3ua_as;
 }
 
-m3ua_asp_id_t pt_m3ua_add_asp(m3ua_as_id_t m3ua_as_id, 
+m3ua_asp_id_t pt_m3ua_add_asp(m3ua_as_id_t m3ua_as_id,
                         pt_int32_t protocol, pt_int32_t service,
                         pt_char_t *local_ip, pt_uint16_t local_port,
                         pt_char_t *remote_ip, pt_uint16_t remote_port)
@@ -667,6 +667,9 @@ void pt_m3ua_dump()
     list_head_t *pos_m3ua_as;
     list_head_t *pos_m3ua_asp;
 
+    if (list_empty(&list_ss7office))
+        return;
+
     printf("\n%-8s  "
            "%-9s  %-4s  %-7s  %-9s  %-16s  "
            "%-12s  %-11s  %-20s  %-20s  %-15s  %-10s  %s/%s\n",
@@ -694,17 +697,17 @@ void pt_m3ua_dump()
                 m3ua_asp = list_entry(pos_m3ua_asp, m3ua_asp_t, node);
                 printf("%-8d  "
                        "%-9d  %-4d  %-7d  %-9d  %-16d  "
-                       "%-12d  %-11d  %-20s  %-20s  %-15d  %-10d  %lu/%lu\n",
+                       "%-12s  %-11s  %-20s  %-20s  %-15d  %-10d  %lu/%lu\n",
                        ss7office->officeid,
                        m3ua_as->useage,
                        m3ua_as->n,
                        m3ua_as->mode,
                        m3ua_as->netapp,
                        m3ua_as->route_context,
-                       m3ua_asp->conn_item.protocol, 
-                       m3ua_asp->conn_item.service, 
-                       pt_addr_a(&m3ua_asp->conn_item.local_addr[0]), 
-                       pt_addr_a(&m3ua_asp->conn_item.remote_addr[0]), 
+                       m3ua_asp->conn_item.protocol == 132 ? "sctp" : "tcp",
+                       m3ua_asp->conn_item.service == 1 ? "client" : "server",
+                       pt_addr_a(&m3ua_asp->conn_item.local_addr[0]),
+                       pt_addr_a(&m3ua_asp->conn_item.remote_addr[0]),
                        m3ua_asp->conn_status,
                        m3ua_asp->asp_status,
                        m3ua_asp->stat_send,

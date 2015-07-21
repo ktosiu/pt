@@ -291,6 +291,9 @@ void pt_uc_dump()
     list_head_t *pos_inst;
     list_head_t *pos_msg;
 
+    if (list_empty(&list_msgflow))
+        return;
+
     printf("\n%-16s  %-16s  %-12s  %-10s  %-9s  %-12s  %-9s  %-12s  %-10s  %-10s  %-10s  %-10s\n",
            "msgflow_name",
            "inst_name",

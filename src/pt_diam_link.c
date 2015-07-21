@@ -94,7 +94,7 @@ diam_link_status_e pt_diam_conn_status(diam_conn_t *diam_conn)
 
 pt_int32_t pt_diam_send_data_to_conn(diam_conn_t *diam_conn, pt_uint8_t *in, pt_int32_t len)
 {
-    PT_LOG(PTLOG_DEBUG, "diam send data to conn, conn_id = %p, in = %p, len = %d", 
+    PT_LOG(PTLOG_DEBUG, "diam send data to conn, conn_id = %p, in = %p, len = %d",
             diam_conn->conn_id, in, len);
     diam_conn->stat_send++;
 
@@ -335,10 +335,10 @@ void pt_diam_recv_dw(diam_conn_t *diam_conn, pt_uint8_t *in, pt_int32_t len)
     }
 }
 
-/* cli send cer immediate and svr delay send cer when recv conn up notify */ 
+/* cli send cer immediate and svr delay send cer when recv conn up notify */
 pt_int32_t pt_diam_recv_msg_notify(diam_conn_t *diam_conn, pt_conn_msg_notify_t *conn_msg_notify)
 {
-    PT_LOG(PTLOG_DEBUG, "recv notify msg, link_id = %u, conn_id = %p, status = %d!", 
+    PT_LOG(PTLOG_DEBUG, "recv notify msg, link_id = %u, conn_id = %p, status = %d!",
         diam_conn->diam_link->link_id, conn_msg_notify->conn_id, conn_msg_notify->conn_status);
 
     diam_conn->conn_status = conn_msg_notify->conn_status;
@@ -364,9 +364,9 @@ pt_int32_t pt_diam_recv_msg_data(diam_conn_t *diam_conn, pt_conn_msg_data_t *con
     cmdcode = pt_diam_get_cmd_code(data, len);
 
     PT_LOG(PTLOG_DEBUG, "recv data msg, link_id = %u, conn_id = %p, "
-                        "cmdcode = %u, data = %p, len = %u!", 
+                        "cmdcode = %u, data = %p, len = %u!",
         diam_conn->diam_link->link_id, conn_msg_data->conn_id, cmdcode, data, len);
-    
+
     switch (cmdcode)
     {
         case DIAM_COM_CMD_AS:
@@ -405,16 +405,16 @@ pt_int32_t pt_diam_recv_msg_data(diam_conn_t *diam_conn, pt_conn_msg_data_t *con
 pt_int32_t pt_diam_recv_msg(diam_conn_t *diam_conn, pt_conn_msg_t *conn_msg)
 {
     pt_int32_t rtn;
-    
+
     diam_conn->stat_recv++;
-    
+
     if (conn_msg->msg_type == PT_CONN_MSG_NOTIFY) {
         rtn = pt_diam_recv_msg_notify(diam_conn, &conn_msg->msg.msg_notify);
     } else if (conn_msg->msg_type == PT_CONN_MSG_DATA) {
         rtn = pt_diam_recv_msg_data(diam_conn, &conn_msg->msg.msg_data);
     } else {
         PT_LOG(PTLOG_ERROR, "recv invalid msg, msg_type = %d!", conn_msg->msg_type);
-        rtn = -0xfe; 
+        rtn = -0xfe;
     }
 
     return rtn;
@@ -452,7 +452,7 @@ void pt_diam_monitor_link(void)
     diam_conn_t *diam_conn;
     list_head_t *pos_link;
     list_head_t *pos_conn;
-    
+
     list_for_each(pos_link, &list_diam_link) {
         diam_link = list_entry(pos_link, diam_link_t, node);
         list_for_each(pos_conn, &diam_link->list_conn) {
@@ -472,7 +472,7 @@ void *pt_diam_thread(void *arg)
     }
 }
 
-diam_conn_id_t pt_diam_add_conn(diam_link_id_t diam_link_id, 
+diam_conn_id_t pt_diam_add_conn(diam_link_id_t diam_link_id,
                     pt_int32_t protocol, pt_int32_t service,
                     pt_char_t *local_ip, pt_uint16_t local_port,
                     pt_char_t *remote_ip, pt_uint16_t remote_port)
@@ -498,7 +498,7 @@ diam_conn_id_t pt_diam_add_conn(diam_link_id_t diam_link_id,
     }
 
     diam_conn->conn_item.sctp_ppid = PT_SCTP_PPID_DIAM;
-    
+
     diam_conn->conn_item.handle_data_func = (_PT_HANDLE_DATA)pt_diam_recv_msg;
     diam_conn->conn_item.handle_data_func_arg = diam_conn;
     diam_conn->conn_id = pt_conn_add(&diam_conn->conn_item);
@@ -509,13 +509,13 @@ diam_conn_id_t pt_diam_add_conn(diam_link_id_t diam_link_id,
 void pt_diam_del_conn(diam_conn_id_t diam_conn_id)
 {
     diam_conn_t *diam_conn;
-    
+
     diam_conn = diam_conn_id;
     pt_conn_del(diam_conn->conn_id);
     pt_diam_conn_free(diam_conn);
 }
 
-diam_link_id_t pt_diam_add_link(pt_uint32_t link_id, 
+diam_link_id_t pt_diam_add_link(pt_uint32_t link_id,
                     pt_char_t *local_host_name, pt_char_t *local_realm,
                     pt_char_t *remote_host_name, pt_char_t *remote_realm)
 {
@@ -523,7 +523,7 @@ diam_link_id_t pt_diam_add_link(pt_uint32_t link_id,
 
     if (pt_diam_link_locate(link_id) != NULL)
         return NULL;
-    
+
     diam_link = pt_diam_link_alloc();
     if (diam_link == NULL)
         return NULL;
@@ -545,7 +545,7 @@ void pt_diam_del_link(diam_link_id_t diam_link_id)
     diam_conn_t *diam_conn;
 
     diam_link = diam_link_id;
-    
+
     while (!list_empty(&diam_link->list_conn)) {
         diam_conn = list_entry(diam_link->list_conn.next, diam_conn_t, node);
         pt_diam_del_conn(diam_conn);
@@ -560,6 +560,9 @@ void pt_diam_dump(void)
     diam_conn_t *diam_conn;
     list_head_t *pos_link;
     list_head_t *pos_conn;
+
+    if (list_empty(&list_diam_link))
+        return;
 
     printf("\n%-7s  %-18s  %-12s  %-18s  %-12s  %-8s  %-7s  %-20s  %-20s  %-11s  %-11s  %s/%s\n",
            "link_id",
@@ -576,21 +579,21 @@ void pt_diam_dump(void)
            "send",
            "recv"
            );
-    
+
     list_for_each(pos_link, &list_diam_link) {
         diam_link = list_entry(pos_link, diam_link_t, node);
         list_for_each(pos_conn, &diam_link->list_conn) {
             diam_conn = list_entry(pos_conn, diam_conn_t, node);
-            printf("%-7u  %-18s  %-12s  %-18s  %-12s  %-8d  %-7d  %-20s  %-20s  %-11d  %-11d  %lu/%lu\n",
+            printf("%-7u  %-18s  %-12s  %-18s  %-12s  %-8s  %-7s  %-20s  %-20s  %-11d  %-11d  %lu/%lu\n",
                    diam_link->link_id,
                    diam_link->diam_info.local_host_name,
                    diam_link->diam_info.local_realm,
                    diam_link->diam_info.remote_host_name,
                    diam_link->diam_info.remote_realm,
-                   diam_conn->conn_item.protocol, 
-                   diam_conn->conn_item.service, 
-                   pt_addr_a(&diam_conn->conn_item.local_addr[0]), 
-                   pt_addr_a(&diam_conn->conn_item.remote_addr[0]), 
+                   diam_conn->conn_item.protocol == 132 ? "sctp" : "tcp",
+                   diam_conn->conn_item.service == 1 ? "client" : "server",
+                   pt_addr_a(&diam_conn->conn_item.local_addr[0]),
+                   pt_addr_a(&diam_conn->conn_item.remote_addr[0]),
                    diam_conn->conn_status,
                    diam_conn->link_status,
                    diam_conn->stat_send,
