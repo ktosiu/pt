@@ -24,7 +24,7 @@ lksctp-tools-devel-1.0.10-5.el6.x86\_64.rpm
 ====
 
 ```bash
-(rm -rf build && mkdir build && cd build && cmake .. && make)
+make clean && make
 ```
 
 配置文件
